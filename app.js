@@ -16,6 +16,11 @@ window.app = {
     try {
       console.log('🔧 PWA Estimator iniciando...');
       
+      // ⚠️ FORZAR SCROLL AL INICIO AL CARGAR
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
       // Cargar tema guardado
       this.cargarTemaGuardado();
       
@@ -63,17 +68,36 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // MOSTRAR LOGIN
+  // MOSTRAR LOGIN (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   mostrarLogin: function() {
     const modal = document.getElementById('login-modal');
     if (modal) {
       modal.style.display = 'flex';
+      modal.style.visibility = 'visible';
+      modal.style.opacity = '1';
+      modal.classList.add('active');
     }
     
-    // Ocultar sidebar hasta que se decida
-    document.getElementById('sidebar-admin')?.style.setProperty('display', 'none');
-    document.getElementById('sidebar-cliente')?.style.setProperty('display', 'none');
+    // Ocultar sidebars hasta que se decida
+    const sidebarAdmin = document.getElementById('sidebar-admin');
+    const sidebarCliente = document.getElementById('sidebar-cliente');
+    
+    if (sidebarAdmin) {
+      sidebarAdmin.style.setProperty('display', 'none', 'important');
+      sidebarAdmin.classList.remove('visible');
+    }
+    if (sidebarCliente) {
+      sidebarCliente.style.setProperty('display', 'none', 'important');
+      sidebarCliente.classList.remove('visible');
+    }
+    
+    // Forzar scroll al inicio
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    console.log('🔐 Login mostrado');
   },
   
   // ─────────────────────────────────────────────────────────────
