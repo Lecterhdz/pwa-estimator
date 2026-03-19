@@ -35,14 +35,14 @@ window.adminDiagnosticos = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // RENDERIZAR TABLA
+  // RENDERIZAR TABLA (CORREGIDO + NUEVOS STATUS)
   // ─────────────────────────────────────────────────────────────
   renderTabla: function(diagnosticos) {
     const tbody = document.getElementById('tabla-diagnosticos');
     if (!tbody) return;
     
     if (!diagnosticos || diagnosticos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--ink4);">📭 Sin diagnósticos registrados aún</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:40px;text-align:center;color:var(--ink4);">📭 Sin diagnósticos registrados aún</td></tr>';
       return;
     }
     
@@ -56,16 +56,18 @@ window.adminDiagnosticos = {
       });
       
       const nivelColor = this.getColorNivel(d.resultado?.nivel);
-      const scoreColor = this.getColorScore(d.meta?.leadScore || 0);
+      const semanas = d.resultado?.semanas || 'Por definir';
+      // Asegurar que siempre diga "semanas"
+      const semanasTexto = semanas.includes('semana') ? semanas : `${semanas} semanas`;
+      
+      // Status del proyecto
+      const status = d.status || 'pendiente';
+      const statusBadge = this.getStatusBadge(status, d.fechaEntrega);
+      
+      // Solicitud enviada
       const solicitudBadge = d.solicitudEnviada 
-        ? '<span style="padding:4px 10px;background:var(--green-l);color:var(--green);border-radius:20px;font-size:11px;font-weight:600;">✅ Enviada</span>' 
-        : '<span style="padding:4px 10px;background:var(--bg2);color:var(--ink4);border-radius:20px;font-size:11px;">Pendiente</span>';
-      
-      const contactoBadge = d.contactado
-        ? '<span style="padding:4px 10px;background:var(--blue-l);color:var(--blue);border-radius:20px;font-size:11px;font-weight:600;">📞 Contactado</span>'
-        : '';
-      
-      const inversion = d.resultado?.rangoPrecio?.texto || 'Por definir';
+        ? '<span class="badge-solicitud enviada">✅ Enviada</span>' 
+        : '<span class="badge-solicitud pendiente">⏳ Pendiente</span>';
       
       return `
         <tr style="border-bottom:1px solid var(--border);transition:background 0.2s;">
@@ -74,36 +76,216 @@ window.adminDiagnosticos = {
           <td style="padding:12px;">${d.cliente?.email || '—'}</td>
           <td style="padding:12px;">${d.cliente?.industria || '—'}</td>
           <td style="padding:12px;">
-            <span style="padding:4px 10px;background:${nivelColor};color:white;border-radius:20px;font-size:11px;font-weight:600;">
+            <span class="badge-nivel ${d.resultado?.nivel?.toLowerCase()}" style="background:${nivelColor};color:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;">
               ${d.resultado?.nivel || '—'}
             </span>
           </td>
-          <td style="padding:12px;font-family:var(--mono);font-size:12px;">${inversion}</td>
+          <td style="padding:12px;font-family:var(--mono);font-size:12px;">${semanasTexto}</td>
           <td style="padding:12px;">${solicitudBadge}</td>
+          <td style="padding:12px;">${statusBadge}</td>
           <td style="padding:12px;">
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div class="tabla-acciones">
               <button onclick="adminDiagnosticos.contactar('${d.id}', '${d.cliente?.email || ''}')" 
-                style="padding:6px 12px;background:var(--blue);color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;transition:all 0.2s;"
-                title="Contactar cliente">
-                📧 Contactar
+                class="tabla-btn contactar" title="Contactar cliente">
+                📧
               </button>
               <button onclick="adminDiagnosticos.verDetalle('${d.id}')" 
-                style="padding:6px 12px;background:var(--bg2);color:var(--ink);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer;transition:all 0.2s;"
-                title="Ver detalles">
-                👁️ Ver
+                class="tabla-btn ver" title="Ver detalles">
+                👁️
               </button>
-              ${d.contactado ? '' : `<button onclick="adminDiagnosticos.marcarComoContactado('${d.id}')" 
-                style="padding:6px 12px;background:var(--green);color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;transition:all 0.2s;"
-                title="Marcar como contactado">
-                ✅ Marcar
-              </button>`}
+              <button onclick="adminDiagnosticos.cambiarStatus('${d.id}')" 
+                class="tabla-btn status" title="Cambiar status">
+                📊
+              </button>
+              <button onclick="adminDiagnosticos.eliminarDiagnostico('${d.id}')" 
+                class="tabla-btn delete" title="Eliminar" style="background:var(--rose);color:white;">
+                🗑️
+              </button>
             </div>
           </td>
         </tr>
       `;
     }).join('');
   },
+  // ─────────────────────────────────────────────────────────────
+  // CAMBIAR STATUS DEL PROYECTO (NUEVA FUNCIÓN)
+  // ─────────────────────────────────────────────────────────────
+  cambiarStatus: async function(id) {
+    try {
+      const diagnostico = await window.db.diagnosticos.get(id);
+      if (!diagnostico) {
+        alert('❌ Diagnóstico no encontrado');
+        return;
+      }
+      
+      const statusActual = diagnostico.status || 'pendiente';
+      
+      // Mostrar menú de status
+      const nuevoStatus = prompt(
+        `Cambiar status del proyecto:\n\n` +
+        `Status actual: ${statusActual.toUpperCase()}\n\n` +
+        `Escribe el número del nuevo status:\n` +
+        `1️⃣ Pendiente\n` +
+        `2️⃣ Contactado\n` +
+        `3️⃣ Cotización Aceptada\n` +
+        `4️⃣ En Proceso\n` +
+        `5️⃣ Entregada\n` +
+        `6️⃣ Cancelada`,
+        statusActual === 'pendiente' ? '1' : 
+        statusActual === 'contactado' ? '2' : 
+        statusActual === 'aceptada' ? '3' : 
+        statusActual === 'en_proceso' ? '4' : 
+        statusActual === 'entregada' ? '5' : '6'
+      );
+      
+      if (!nuevoStatus) return;
+      
+      const statusMap = {
+        '1': 'pendiente',
+        '2': 'contactado',
+        '3': 'aceptada',
+        '4': 'en_proceso',
+        '5': 'entregada',
+        '6': 'cancelada'
+      };
+      
+      const statusFinal = statusMap[nuevoStatus] || statusActual;
+      
+      // Si es "En Proceso", pedir fecha de entrega
+      let fechaEntrega = diagnostico.fechaEntrega;
+      if (statusFinal === 'en_proceso') {
+        const semanas = diagnostico.resultado?.semanas || '8';
+        const fechaSugerida = prompt(
+          `Ingresa la fecha estimada de entrega:\n\n` +
+          `Formato: YYYY-MM-DD\n` +
+          `Sugerida (según cotización): ${this.calcularFechaEntrega(semanas)}`,
+          this.calcularFechaEntrega(semanas)
+        );
+        if (fechaSugerida) {
+          fechaEntrega = fechaSugerida;
+        }
+      }
+      
+      // Si es "Entregada", mostrar checklist
+      if (statusFinal === 'entregada') {
+        const checklist = confirm(
+          `✅ Checklist de Entrega:\n\n` +
+          `□ Código fuente entregado\n` +
+          `□ Documentación completa\n` +
+          `□ PWA instalable funcionando\n` +
+          `□ Credenciales de acceso entregadas\n` +
+          `□ Pago final recibido\n\n` +
+          `¿Confirmas que todos los items están completados?`
+        );
+        
+        if (!checklist) {
+          alert('⚠️ Completa el checklist antes de marcar como entregada');
+          return;
+        }
+      }
+      
+      // Actualizar en DB
+      diagnostico.status = statusFinal;
+      diagnostico.fechaEntrega = fechaEntrega;
+      diagnostico.fechaStatusChange = new Date().toISOString();
+      
+      await window.db.diagnosticos.add(diagnostico);
+      
+      console.log('✅ Status actualizado:', statusFinal);
+      alert(`✅ Status actualizado a: ${statusFinal.toUpperCase()}`);
+      
+      // Recargar tabla
+      this.cargar();
+      
+    } catch (error) {
+      console.error('❌ Error cambiando status:', error);
+      alert('❌ Error: ' + error.message);
+    }
+  },
+  // ─────────────────────────────────────────────────────────────
+  // ELIMINAR DIAGNÓSTICO (NUEVA FUNCIÓN)
+  // ─────────────────────────────────────────────────────────────
+  eliminarDiagnostico: async function(id) {
+    const confirmar = confirm(
+      `⚠️ ¿Estás SEGURO de eliminar este diagnóstico?\n\n` +
+      `Esta acción NO se puede deshacer.\n\n` +
+      `ID: ${id}`
+    );
+    
+    if (!confirmar) return;
+    
+    try {
+      if (window.db?.diagnosticos) {
+        // Firebase no tiene delete directo en esta implementación
+        // Marcamos como eliminado en lugar de borrar
+        const diagnostico = await window.db.diagnosticos.get(id);
+        if (diagnostico) {
+          diagnostico.eliminado = true;
+          diagnostico.fechaEliminacion = new Date().toISOString();
+          await window.db.diagnosticos.add(diagnostico);
+          
+          console.log('✅ Diagnóstico marcado como eliminado:', id);
+          alert('✅ Diagnóstico eliminado');
+          
+          // Recargar tabla
+          this.cargar();
+        }
+      } else {
+        // IndexedDB - borrar realmente
+        // Implementar según tu estructura
+        alert('⚠️ Función de eliminar en desarrollo para IndexedDB');
+      }
+    } catch (error) {
+      console.error('❌ Error eliminando diagnóstico:', error);
+      alert('❌ Error: ' + error.message);
+    }
+  },  
+  // ─────────────────────────────────────────────────────────────
+  // CALCULAR FECHA DE ENTREGA SUGERIDA (FUNCIÓN AUXILIAR)
+  // ─────────────────────────────────────────────────────────────
+  calcularFechaEntrega: function(semanas) {
+    try {
+      const semanasNum = parseInt(semanas) || 8;
+      const hoy = new Date();
+      const entrega = new Date(hoy.getTime() + (semanasNum * 7 * 24 * 60 * 60 * 1000));
+      return entrega.toISOString().split('T')[0];
+    } catch (error) {
+      return '';
+    }
+  },
+  // ─────────────────────────────────────────────────────────────
+  // OBTENER BADGE DE STATUS (NUEVA FUNCIÓN)
+  // ─────────────────────────────────────────────────────────────
+  getStatusBadge: function(status, fechaEntrega) {
+    const badges = {
+      'pendiente': '<span class="badge-status pendiente">⏳ Pendiente</span>',
+      'contactado': '<span class="badge-status contactado">📞 Contactado</span>',
+      'aceptada': '<span class="badge-status aceptada">✅ Cotización Aceptada</span>',
+      'en_proceso': `<span class="badge-status en_proceso">🔄 En Proceso${fechaEntrega ? ' (' + this.getDiasRestantes(fechaEntrega) + ')' : ''}</span>`,
+      'entregada': '<span class="badge-status entregada">🎉 Entregada</span>',
+      'cancelada': '<span class="badge-status cancelada">❌ Cancelada</span>'
+    };
+    
+    return badges[status] || badges['pendiente'];
+  },
   
+  // ─────────────────────────────────────────────────────────────
+  // CALCULAR DÍAS RESTANTES PARA ENTREGA (NUEVA FUNCIÓN)
+  // ─────────────────────────────────────────────────────────────
+  getDiasRestantes: function(fechaEntrega) {
+    try {
+      const entrega = new Date(fechaEntrega);
+      const hoy = new Date();
+      const diff = Math.ceil((entrega - hoy) / (1000 * 60 * 60 * 24));
+      
+      if (diff < 0) return 'Atrasado';
+      if (diff === 0) return 'Hoy';
+      if (diff === 1) return '1 día';
+      return `${diff} días`;
+    } catch (error) {
+      return '';
+    }
+  },
   // ─────────────────────────────────────────────────────────────
   // OBTENER COLOR POR NIVEL
   // ─────────────────────────────────────────────────────────────
