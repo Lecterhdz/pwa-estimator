@@ -213,7 +213,18 @@ window.estimatorUI = {
     
     this.irAPaso(paso);
   },
-  
+  // ─────────────────────────────────────────────────────────────
+  // ANTERIOR PASO (FUNCIÓN FALTANTE)
+  // ─────────────────────────────────────────────────────────────
+  anteriorPaso: function(paso) {
+    // Validar que el paso sea válido
+    if (paso < 1 || paso > 4) return;
+    
+    // Ir al paso solicitado
+    this.irAPaso(paso);
+    
+    console.log('⬅️ Regresando al paso:', paso);
+  },  
   // ─────────────────────────────────────────────────────────────
   // FINALIZAR (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
