@@ -9,12 +9,13 @@ console.log('🔥 config-firebase.js cargado');
 // ─────────────────────────────────────────────────────────────
 // ⚠️ REEMPLAZA CON TUS CREDENCIALES REALES DE FIREBASE
 window.firebaseConfig = {
-  apiKey: "TU_API_KEY_AQUI",
-  authDomain: "tu-proyecto.firebaseapp.com",
-  projectId: "tu-proyecto",
-  storageBucket: "tu-proyecto.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+// Your web app's Firebase configuration
+  apiKey: "AIzaSyDVBXgkIF4oELj5bCoQZppT_5ZRUo2tDBw",
+  authDomain: "pwa-estimator.firebaseapp.com",
+  projectId: "pwa-estimator",
+  storageBucket: "pwa-estimator.firebasestorage.app",
+  messagingSenderId: "345159725920",
+  appId: "1:345159725920:web:004fb9a057774454b82405"
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ window.firebaseReady = new Promise((resolve) => {
     console.log('✅ Firebase SDK cargado');
     resolve(firebase);
   } else {
-    console.warn('⚠️ Firebase SDK no cargado, usando IndexedDB');
+    console.warn('⚠️ Firebase SDK no cargado, usando IndexedDB como fallback');
     resolve(null);
   }
 });
