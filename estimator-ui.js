@@ -31,7 +31,15 @@ window.estimatorUI = {
   // ─────────────────────────────────────────────────────────────
   agregarListeners: function() {
     document.querySelectorAll('input[name="disciplina"]').forEach(cb => {
-      cb.addEventListener('change', () => {
+      // Prevenir doble click
+      cb.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Toggle manual
+        cb.checked = !cb.checked;
+        
+        // Disparar cambio
         this.actualizarSeleccionDisciplinas();
         this.actualizarPuntosVisibles();
         this.actualizarBadgeMultidisciplinario();
