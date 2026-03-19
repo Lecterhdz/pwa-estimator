@@ -24,11 +24,34 @@ window.firebaseConfig = {
 window.firebaseReady = new Promise((resolve) => {
   if (typeof firebase !== 'undefined') {
     console.log('✅ Firebase SDK cargado');
+    console.log('📦 Project ID:', window.firebaseConfig.projectId);
     resolve(firebase);
   } else {
-    console.warn('⚠️ Firebase SDK no cargado, usando IndexedDB como fallback');
+    console.warn('⚠️ Firebase SDK no cargado, usando IndexedDB');
     resolve(null);
   }
 });
 
-console.log('✅ config-firebase.js listo');
+// ─────────────────────────────────────────────────────────────
+// UTILIDADES PARA VERIFICAR CONEXIÓN
+// ─────────────────────────────────────────────────────────────
+window.verificarFirebase = async function() {
+  try {
+    if (!window.firebaseConfig?.projectId) {
+      console.error('❌ Firebase no configurado');
+      return false;
+    }
+    
+    const db = firebase.firestore();
+    await db.collection('_test').limit(1).get();
+    
+    console.log('✅ Firebase conectado correctamente');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Error conectando Firebase:', error.message);
+    return false;
+  }
+};
+
+console.log('✅ config-firebase.js listo (Modo Producción)');
