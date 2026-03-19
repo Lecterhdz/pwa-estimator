@@ -153,102 +153,146 @@
         <div class="card">
           <div class="card-body">
             
-            <!-- ══════════════════════════════════════ PASO 1: DISCIPLINAS ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ PASO 1: TIPO DE PWA / INDUSTRIA ══════════════════════════════════════ -->
             <div id="paso-1" class="estimador-paso active">
-              <h3>⚙️ 1. Disciplinas de Ingeniería</h3>
-              <p class="estimador-description">Seleccione las disciplinas requeridas para su proyecto:</p>
+              <h3>🎯 1. ¿Para qué industria es tu PWA?</h3>
+              <p class="estimador-description">Selecciona el sector para personalizar tu cotización:</p>
               
-              <div class="disciplinas-grid">
+              <div class="tipos-pwa-grid">
                 
-                <label class="disciplina-card">
-                  <input type="checkbox" name="disciplina" value="electrica">
-                  <div class="disciplina-card-content">
-                    <span class="disciplina-icon">⚡</span>
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="electrica">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">⚡</span>
                     <h4>Eléctrica Industrial</h4>
-                    <p>NOM, Arc Flash, Tierras, Iluminación</p>
-                    <span class="puntos-badge">+15 pts</span>
+                    <p>SmartCot, SmartEvaluation, cálculos técnicos</p>
                   </div>
                 </label>
                 
-                <label class="disciplina-card">
-                  <input type="checkbox" name="disciplina" value="mecanica">
-                  <div class="disciplina-card-content">
-                    <span class="disciplina-icon">⚙️</span>
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="mecanica">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">⚙️</span>
                     <h4>Mecánica / HVAC</h4>
-                    <p>Carga térmica, Bombas, Flujo de aire</p>
-                    <span class="puntos-badge">+15 pts</span>
+                    <p>Mantenimiento, monitoreo, control de equipos</p>
                   </div>
                 </label>
                 
-                <label class="disciplina-card">
-                  <input type="checkbox" name="disciplina" value="civil">
-                  <div class="disciplina-card-content">
-                    <span class="disciplina-icon">🏗️</span>
-                    <h4>Civil / Estructural</h4>
-                    <p>Cimentaciones, Estructuras, Levantamientos</p>
-                    <span class="puntos-badge">+15 pts</span>
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="civil">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🏗️</span>
+                    <h4>Civil / Construcción</h4>
+                    <p>Seguimiento de obra, bitácora, curva S</p>
                   </div>
                 </label>
                 
-                <label class="disciplina-card">
-                  <input type="checkbox" name="disciplina" value="seguridad">
-                  <div class="disciplina-card-content">
-                    <span class="disciplina-icon">🦺</span>
-                    <h4>Seguridad STPS</h4>
-                    <p>LOTO, IPER, Análisis de riesgo</p>
-                    <span class="puntos-badge">+12 pts</span>
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="seguridad">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🦺</span>
+                    <h4>Seguridad Industrial</h4>
+                    <p>Checklists, auditorías, certificaciones STPS</p>
+                  </div>
+                </label>
+                
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="salud">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🏥</span>
+                    <h4>Salud / Servicios</h4>
+                    <p>Agendamiento, historial, recordatorios</p>
+                  </div>
+                </label>
+                
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="comercio">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🛒</span>
+                    <h4>Comercio / Retail</h4>
+                    <p>Catálogo, pedidos, inventario en tiempo real</p>
+                  </div>
+                </label>
+                
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="educacion">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🎓</span>
+                    <h4>Educación / Capacitación</h4>
+                    <p>Cursos, evaluaciones, certificados con QR</p>
+                  </div>
+                </label>
+                
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="servicios">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🔧</span>
+                    <h4>Servicios Técnicos</h4>
+                    <p>Cotización de servicios, agenda, seguimiento</p>
+                  </div>
+                </label>
+                
+                <label class="tipo-pwa-card">
+                  <input type="radio" name="tipoPWA" value="otro">
+                  <div class="tipo-pwa-content">
+                    <span class="tipo-icon">🌐</span>
+                    <h4>Otro / Personalizado</h4>
+                    <p>Especifica tus requerimientos únicos</p>
                   </div>
                 </label>
                 
               </div>
-              
-              <div id="badge-multidisciplinario" class="badge-multidisciplinario"></div>
               
               <button onclick="estimatorUI.siguientePaso(2)" class="topbar-btn primary btn-next">Continuar →</button>
             </div>
             
-            <!-- ══════════════════════════════════════ PASO 2: MOTOR DE COTIZACIÓN ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ PASO 2: FUNCIONALIDADES BASE ══════════════════════════════════════ -->
             <div id="paso-2" class="estimador-paso">
-              <h3>💰 2. Motor de Cotización Universal</h3>
+              <h3>🔧 2. Funcionalidad Principal</h3>
+              <p class="estimador-description">¿Cuál es el propósito central de tu PWA?</p>
               
-              <div class="motor-toggle-card">
-                <label class="motor-toggle-label">
-                  <input type="checkbox" id="motor-cotizacion-toggle">
-                  <div class="motor-toggle-info">
-                    <strong>Activar Motor de Cotización</strong>
-                    <span>Cotiza materiales, mano de obra, servicios y estudios técnicos (+25 pts)</span>
+              <div class="bases-list">
+                
+                <label class="base-card">
+                  <input type="radio" name="base" value="cotizador">
+                  <div class="base-content">
+                    <strong>📋 Cotizador de Servicios/Proyectos</strong>
+                    <span>Catálogo de servicios, cálculo automático, generación de PDF/Excel</span>
                   </div>
                 </label>
-              </div>
-              
-              <div id="motor-componentes" class="componentes-grid">
-                <label class="componente-card">
-                  <input type="checkbox" name="componente" value="materiales">
-                  <span>🧱 Materiales</span>
+                
+                <label class="base-card">
+                  <input type="radio" name="base" value="seguimiento">
+                  <div class="base-content">
+                    <strong>📊 Seguimiento de Obra / Proyectos</strong>
+                    <span>Curva S de avance, bitácora con fotos, alertas de hitos y retrasos</span>
+                  </div>
                 </label>
-                <label class="componente-card">
-                  <input type="checkbox" name="componente" value="mano_obra">
-                  <span>👷 Mano de Obra</span>
+                
+                <label class="base-card">
+                  <input type="radio" name="base" value="evaluaciones">
+                  <div class="base-content">
+                    <strong>📝 Evaluaciones y Certificaciones</strong>
+                    <span>Exámenes con scoring automático, certificados con QR, historial de competencias</span>
+                  </div>
                 </label>
-                <label class="componente-card">
-                  <input type="checkbox" name="componente" value="servicios">
-                  <span>🧠 Servicios</span>
+                
+                <label class="base-card">
+                  <input type="radio" name="base" value="catalogo">
+                  <div class="base-content">
+                    <strong>📦 Catálogo / Inventario Inteligente</strong>
+                    <span>Búsqueda avanzada con filtros, control de stock, integración con proveedores</span>
+                  </div>
                 </label>
-                <label class="componente-card">
-                  <input type="checkbox" name="componente" value="estudios">
-                  <span>📊 Estudios</span>
+                
+                <label class="base-card">
+                  <input type="radio" name="base" value="agenda">
+                  <div class="base-content">
+                    <strong>📅 Agenda / Gestión de Citas</strong>
+                    <span>Calendario interactivo, recordatorios automáticos, integración con WhatsApp/Email</span>
+                  </div>
                 </label>
-                <label class="componente-card">
-                  <input type="checkbox" name="componente" value="viaticos">
-                  <span>🚚 Viáticos</span>
-                </label>
-              </div>
-              
-              <div class="export-option">
-                <label class="export-label">
-                  <input type="checkbox" id="neodata-sync">
-                  <span>Exportación a Neodata / Excel (+15 pts)</span>
-                </label>
+                
               </div>
               
               <div class="estimador-buttons">
@@ -257,35 +301,154 @@
               </div>
             </div>
             
-            <!-- ══════════════════════════════════════ PASO 3: CAPACIDADES ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ PASO 3: MÓDULOS ADICIONALES ══════════════════════════════════════ -->
             <div id="paso-3" class="estimador-paso">
-              <h3>🚀 3. Capacidades Avanzadas</h3>
+              <h3>🧩 3. Módulos Adicionales</h3>
+              <p class="estimador-description">Selecciona las funcionalidades extra que necesitas:</p>
               
-              <div class="capacidades-list">
-                <label class="capacidad-card">
-                  <input type="checkbox" name="capacidad" value="offline">
-                  <div class="capacidad-info">
-                    <strong>Modo Offline Completo</strong>
-                    <span>Trabajar sin conexión, sincronización automática (+30 pts)</span>
-                  </div>
-                </label>
-                
-                <label class="capacidad-card">
-                  <input type="checkbox" name="capacidad" value="cloudSync">
-                  <div class="capacidad-info">
-                    <strong>Sincronización en Nube</strong>
-                    <span>Backup automático, multi-dispositivo (+25 pts)</span>
-                  </div>
-                </label>
-                
-                <label class="capacidad-card">
-                  <input type="checkbox" name="capacidad" value="erp">
-                  <div class="capacidad-info">
-                    <strong>Integración con ERP</strong>
-                    <span>SAP, Oracle, NetSuite (+40 pts)</span>
-                  </div>
-                </label>
-              </div>
+              <!-- Sección: Reportes y Análisis -->
+              <details class="modulo-seccion" open>
+                <summary>
+                  <span class="modulo-summary-icon">📊</span>
+                  <span>Reportes y Análisis</span>
+                </summary>
+                <div class="modulos-grid">
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="dashboard">
+                    <span>Dashboard ejecutivo con KPIs</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="exportacion">
+                    <span>Exportación a Excel/Neodata</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="graficas">
+                    <span>Gráficas personalizables</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="alertas">
+                    <span>Alertas automáticas por email</span>
+                  </label>
+                </div>
+              </details>
+              
+              <!-- Sección: Evidencias y Multimedia -->
+              <details class="modulo-seccion">
+                <summary>
+                  <span class="modulo-summary-icon">📸</span>
+                  <span>Evidencias y Multimedia</span>
+                </summary>
+                <div class="modulos-grid">
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="fotos_geo">
+                    <span>Fotos con geolocalización</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="anotaciones">
+                    <span>Anotaciones sobre imágenes</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="firmas">
+                    <span>Firmas digitales en pantalla</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="archivos">
+                    <span>Adjuntar archivos (PDF, DOC, XLS)</span>
+                  </label>
+                </div>
+              </details>
+              
+              <!-- Sección: Seguridad y Acceso -->
+              <details class="modulo-seccion">
+                <summary>
+                  <span class="modulo-summary-icon">🔐</span>
+                  <span>Seguridad y Acceso</span>
+                </summary>
+                <div class="modulos-grid">
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="login">
+                    <span>Login con email/contraseña</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="roles">
+                    <span>Roles y permisos (Admin, Operador, Cliente)</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="auditoria">
+                    <span>Auditoría de acciones (logs)</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="encriptacion">
+                    <span>Encriptación de datos sensibles</span>
+                  </label>
+                </div>
+              </details>
+              
+              <!-- Sección: Integraciones -->
+              <details class="modulo-seccion">
+                <summary>
+                  <span class="modulo-summary-icon">🔗</span>
+                  <span>Integraciones</span>
+                </summary>
+                <div class="modulos-grid">
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="nube">
+                    <span>Backup automático + Multi-dispositivo</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="api">
+                    <span>API personalizada + Webhooks</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="whatsapp">
+                    <span>Integración con WhatsApp Business</span>
+                  </label>
+                </div>
+              </details>
+              
+              <!-- Sección: Personalización -->
+              <details class="modulo-seccion">
+                <summary>
+                  <span class="modulo-summary-icon">🎨</span>
+                  <span>Personalización</span>
+                </summary>
+                <div class="modulos-grid">
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="branding">
+                    <span>Logo y colores de tu marca</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="flujos">
+                    <span>Flujos de trabajo personalizados</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="campos">
+                    <span>Campos adicionales en formularios</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="white">
+                    <span>White Label (sin marca del desarrollador)</span>
+                  </label>
+                </div>
+              </details>
+              
+              <!-- Sección: Nuevos -->
+              <details class="modulo-seccion">
+                <summary>
+                  <span class="modulo-summary-icon">✨</span>
+                  <span>Novedades</span>
+                </summary>
+                <div class="modulos-grid">
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="push">
+                    <span>Notificaciones Push en tiempo real</span>
+                  </label>
+                  <label class="modulo-card">
+                    <input type="checkbox" name="modulo" value="reportes_pdf">
+                    <span>Generador de Reportes PDF personalizados</span>
+                  </label>
+                </div>
+              </details>
               
               <div class="estimador-buttons">
                 <button onclick="estimatorUI.anteriorPaso(2)" class="topbar-btn ghost">← Atrás</button>
@@ -293,10 +456,53 @@
               </div>
             </div>
             
-            <!-- ══════════════════════════════════════ PASO 4: DATOS DE CONTACTO ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ PASO 4: ESCALA Y CONTACTO ══════════════════════════════════════ -->
             <div id="paso-4" class="estimador-paso">
-              <h3>📋 4. Datos de Contacto</h3>
+              <h3>📋 4. Escala y Contacto</h3>
               
+              <!-- Escala de Usuarios -->
+              <div class="escala-section">
+                <label class="f-label">¿Cuántos usuarios usarán la PWA?</label>
+                <div class="escala-options">
+                  <label class="escala-option">
+                    <input type="radio" name="escala" value="1-5" checked>
+                    <div class="escala-info">
+                      <span class="escala-rango">1–5 usuarios</span>
+                      <span class="escala-precio">+$0</span>
+                    </div>
+                  </label>
+                  <label class="escala-option">
+                    <input type="radio" name="escala" value="6-20">
+                    <div class="escala-info">
+                      <span class="escala-rango">6–20 usuarios</span>
+                      <span class="escala-precio">+$2,500</span>
+                    </div>
+                  </label>
+                  <label class="escala-option">
+                    <input type="radio" name="escala" value="21-50">
+                    <div class="escala-info">
+                      <span class="escala-rango">21–50 usuarios</span>
+                      <span class="escala-precio">+$6,000</span>
+                    </div>
+                  </label>
+                  <label class="escala-option">
+                    <input type="radio" name="escala" value="51-100">
+                    <div class="escala-info">
+                      <span class="escala-rango">51–100 usuarios</span>
+                      <span class="escala-precio">+$12,000</span>
+                    </div>
+                  </label>
+                  <label class="escala-option">
+                    <input type="radio" name="escala" value="100+">
+                    <div class="escala-info">
+                      <span class="escala-rango">100+ usuarios</span>
+                      <span class="escala-precio">Cotización personalizada</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Formulario de Contacto -->
               <div class="contacto-form">
                 <div class="form-group">
                   <label for="cliente-empresa">Empresa</label>
@@ -317,15 +523,20 @@
                   <label for="cliente-industria">Industria</label>
                   <select id="cliente-industria" class="f-input">
                     <option value="">Selecciona una opción</option>
-                    <option value="Electrico">Eléctrico</option>
-                    <option value="Mecanico">Mecánico / HVAC</option>
+                    <option value="Electrica">Eléctrica</option>
+                    <option value="Mecanica">Mecánica / HVAC</option>
                     <option value="Civil">Civil / Construcción</option>
                     <option value="Seguridad">Seguridad Industrial</option>
+                    <option value="Salud">Salud / Servicios</option>
+                    <option value="Comercio">Comercio / Retail</option>
+                    <option value="Educacion">Educación / Capacitación</option>
+                    <option value="Servicios">Servicios Técnicos</option>
                     <option value="Otro">Otro</option>
                   </select>
                 </div>
               </div>
               
+              <!-- Resumen de Cotización -->
               <div class="estimador-resumen">
                 <div class="resumen-row">
                   <span>Puntos estimados:</span>
@@ -333,13 +544,42 @@
                 </div>
                 <div class="resumen-row">
                   <span>Nivel estimado:</span>
-                  <span id="nivel-resumen" class="resumen-value nivel-starter">Starter</span>
+                  <span id="nivel-resumen" class="resumen-value nivel-basico">Básico</span>
+                </div>
+                <div class="resumen-row">
+                  <span>Inversión estimada:</span>
+                  <span id="precio-resumen" class="resumen-value precio">$15,000 – $35,000 MXN</span>
+                </div>
+                <div class="resumen-row">
+                  <span>Tiempo estimado:</span>
+                  <span id="tiempo-resumen" class="resumen-value tiempo">3–5 semanas</span>
+                </div>
+              </div>
+              
+              <!-- Información Adicional -->
+              <div class="estimador-info-final">
+                <div style="background:var(--blue-l);padding:16px;border-radius:12px;border:1px solid var(--blue-m);margin-bottom:16px;">
+                  <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:8px;">📌 ¿Qué incluye tu cotización?</div>
+                  <ul style="font-size:12px;color:var(--ink4);line-height:1.8;padding-left:20px;margin:0;">
+                    <li>Desarrollo de PWA progresiva (funciona offline)</li>
+                    <li>Instalación en cualquier dispositivo (Android, iOS, Desktop)</li>
+                    <li>Panel administrativo para gestión de usuarios</li>
+                    <li>Soporte técnico por 30 días después de la entrega</li>
+                    <li>Documentación básica de uso</li>
+                  </ul>
+                </div>
+                
+                <div style="background:var(--amber-l);padding:16px;border-radius:12px;border-left:3px solid var(--amber);">
+                  <div style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:8px;">⚠️ Importante</div>
+                  <div style="font-size:11px;color:var(--ink4);line-height:1.6;">
+                    Esta es una estimación preliminar. La cotización formal se enviará a tu email después de revisar tus requerimientos específicos. El pago es 50% al iniciar y 50% al entregar.
+                  </div>
                 </div>
               </div>
               
               <div class="estimador-buttons">
                 <button onclick="estimatorUI.anteriorPaso(3)" class="topbar-btn ghost">← Atrás</button>
-                <button onclick="estimatorUI.finalizarDiagnostico()" class="topbar-btn primary">✅ Finalizar Diagnóstico</button>
+                <button onclick="estimatorUI.finalizarDiagnostico()" class="topbar-btn primary">✅ Ver Cotización Formal</button>
               </div>
             </div>
             
@@ -347,16 +587,45 @@
             <div id="paso-resultado" class="estimador-paso">
               <div class="resultado-success">
                 <div class="resultado-icon">✅</div>
-                <h3>Diagnóstico Completado</h3>
+                <h3>¡Diagnóstico Completado!</h3>
               </div>
               
               <div id="diagnostico-contenido" class="diagnostico-content"></div>
               
               <div id="mensaje-cierre" class="mensaje-cierre"></div>
               
+              <!-- Datos de Pago y Contacto -->
+              <div class="resultado-pago-info">
+                <h4 style="color:var(--blue);margin-bottom:12px;font-size:14px;">📋 Siguiente Paso: Cotización Formal</h4>
+                
+                <div style="background:var(--bg);padding:16px;border-radius:8px;margin-bottom:16px;">
+                  <div style="font-size:12px;color:var(--ink4);margin-bottom:8px;">📧 Envía tu diagnóstico a:</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--ink);">TU_EMAIL@DOMINIO.COM</div>
+                  <div style="font-size:12px;color:var(--ink4);margin-top:4px;">o WhatsApp: +52 55 1234 5678</div>
+                </div>
+                
+                <div style="background:var(--bg);padding:16px;border-radius:8px;margin-bottom:16px;">
+                  <div style="font-size:12px;color:var(--ink4);margin-bottom:8px;">💳 Forma de Pago:</div>
+                  <div style="font-size:13px;color:var(--ink);font-weight:600;margin-bottom:8px;">Transferencia Bancaria</div>
+                  <div style="font-size:12px;color:var(--ink3);line-height:1.6;">
+                    <strong>Banco:</strong> BBVA<br>
+                    <strong>CLABE:</strong> 012345678901234567<br>
+                    <strong>Beneficiario:</strong> TU NOMBRE O EMPRESA<br>
+                    <strong>Concepto:</strong> Desarrollo PWA - [Nombre de tu empresa]
+                  </div>
+                </div>
+                
+                <div style="background:var(--amber-l);padding:12px;border-radius:8px;border-left:3px solid var(--amber);margin-bottom:16px;">
+                  <div style="font-size:12px;color:var(--amber);font-weight:600;">⚠️ Importante:</div>
+                  <div style="font-size:11px;color:var(--ink4);margin-top:4px;line-height:1.6;">
+                    El pago inicial es del 50% para comenzar el desarrollo. El 50% restante al entregar la PWA funcional. Tiempo estimado: 3-16 semanas según complejidad.
+                  </div>
+                </div>
+              </div>
+              
               <div class="resultado-buttons">
-                <button onclick="estimatorUI.descargarPDF()" class="topbar-btn ghost">📄 Descargar PDF</button>
-                <button onclick="estimatorUI.solicitarDemo()" class="topbar-btn primary">📅 Solicitar Demo</button>
+                <button onclick="estimatorUI.descargarPDF()" class="topbar-btn ghost">📄 Descargar Diagnóstico</button>
+                <button onclick="estimatorUI.solicitarDemo()" class="topbar-btn primary">📅 Agendar Demo</button>
               </div>
             </div>
             
