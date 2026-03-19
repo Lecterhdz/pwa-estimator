@@ -307,7 +307,34 @@ window.adminDiagnosticos = {
       console.error('❌ Error eliminando diagnóstico:', error);
       alert('❌ Error: ' + error.message);
     }
-  },  
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // HELPERS PARA STATUS (AGREGAR DENTRO DE adminDiagnosticos)
+  // ─────────────────────────────────────────────────────────────
+  getStatusNumber: function(status) {
+    const map = {
+      'pendiente': '1',
+      'contactado': '2',
+      'aceptada': '3',
+      'en_proceso': '4',
+      'entregada': '5',
+      'rechazada': '6'
+    };
+    return map[status] || '1';
+  },
+  
+  getStatusLabel: function(status) {
+    const map = {
+      'pendiente': 'Pendiente',
+      'contactado': 'Contactado',
+      'aceptada': '✅ Aceptada',
+      'en_proceso': '🔄 En Proceso',
+      'entregada': '🎉 Entregada',
+      'rechazada': '❌ Rechazada'
+    };
+    return map[status] || status;
+  },
   // ─────────────────────────────────────────────────────────────
   // CALCULAR FECHA DE ENTREGA SUGERIDA (FUNCIÓN AUXILIAR)
   // ─────────────────────────────────────────────────────────────
