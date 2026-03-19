@@ -146,50 +146,50 @@
             <!-- PASO 1: DISCIPLINAS -->
             <div id="paso-1">
               <h3 style="margin-bottom:20px;">⚙️ 1. Disciplinas de Ingeniería</h3>
-              <p style="color:var(--ink4);font-size:13px;margin-bottom:16px;">Seleccione las disciplinas requeridas para su proyecto PWA:</p>
+              <p style="color:var(--ink4);font-size:13px;margin-bottom:16px;">Seleccione las disciplinas requeridas para su proyecto:</p>
               
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
                 
-                <label style="position:relative;cursor:pointer;">
-                  <input type="checkbox" name="disciplina" value="electrica" style="position:absolute;opacity:0;">
-                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+                <label class="disciplina-card">
+                  <input type="checkbox" name="disciplina" value="electrica" hidden>
+                  <div class="disciplina-card-content">
                     <span style="font-size:2.5rem;display:block;margin-bottom:12px;">⚡</span>
                     <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Eléctrica Industrial</h4>
                     <p style="color:var(--ink4);font-size:11px;margin:0;">NOM, Arc Flash, Tierras, Iluminación</p>
-                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+15 pts</span>
+                    <span class="puntos-badge">+15 pts</span>
                   </div>
                 </label>
-
-                <label style="position:relative;cursor:pointer;">
-                  <input type="checkbox" name="disciplina" value="mecanica" style="position:absolute;opacity:0;">
-                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+            
+                <label class="disciplina-card">
+                  <input type="checkbox" name="disciplina" value="mecanica" hidden>
+                  <div class="disciplina-card-content">
                     <span style="font-size:2.5rem;display:block;margin-bottom:12px;">⚙️</span>
                     <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Mecánica / HVAC</h4>
                     <p style="color:var(--ink4);font-size:11px;margin:0;">Carga térmica, Bombas, Flujo de aire</p>
-                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+15 pts</span>
+                    <span class="puntos-badge">+15 pts</span>
                   </div>
                 </label>
-
-                <label style="position:relative;cursor:pointer;">
-                  <input type="checkbox" name="disciplina" value="civil" style="position:absolute;opacity:0;">
-                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+            
+                <label class="disciplina-card">
+                  <input type="checkbox" name="disciplina" value="civil" hidden>
+                  <div class="disciplina-card-content">
                     <span style="font-size:2.5rem;display:block;margin-bottom:12px;">🏗️</span>
                     <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Civil / Estructural</h4>
                     <p style="color:var(--ink4);font-size:11px;margin:0;">Cimentaciones, Estructuras, Levantamientos</p>
-                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+15 pts</span>
+                    <span class="puntos-badge">+15 pts</span>
                   </div>
                 </label>
-
-                <label style="position:relative;cursor:pointer;">
-                  <input type="checkbox" name="disciplina" value="seguridad" style="position:absolute;opacity:0;">
-                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+            
+                <label class="disciplina-card">
+                  <input type="checkbox" name="disciplina" value="seguridad" hidden>
+                  <div class="disciplina-card-content">
                     <span style="font-size:2.5rem;display:block;margin-bottom:12px;">🦺</span>
                     <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Seguridad STPS</h4>
                     <p style="color:var(--ink4);font-size:11px;margin:0;">LOTO, IPER, Análisis de riesgo</p>
-                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+12 pts</span>
+                    <span class="puntos-badge">+12 pts</span>
                   </div>
                 </label>
-
+            
               </div>
               
               <div id="badge-multidisciplinario" style="display:none;margin-top:16px;padding:10px 16px;background:var(--amber-l);border:1px solid var(--amber);border-radius:8px;color:var(--amber);font-size:12px;font-weight:600;"></div>
