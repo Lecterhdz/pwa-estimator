@@ -666,9 +666,6 @@ body.tema-claro .topbar-btn.ghost {
   25% { transform: translateX(-10px); }
   75% { transform: translateX(10px); }
 }
-/* ══════════════════════════════════════ CUANDO NO HAY SIDEBAR VISIBLE ══════════════════════════════════════ */
-.layout:has(.sidebar.visible) { grid-template-columns: 240px 1fr !important; }
-.layout:not(:has(.sidebar.visible)) { grid-template-columns: 1fr !important; }
 /* ══════════════════════════════════════ ESTIMADOR SCREEN ══════════════════════════════════════ */
 .estimador-header {
   margin-bottom: 24px;
