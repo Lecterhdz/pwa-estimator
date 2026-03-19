@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// PWA ESTIMATOR - APLICACIÓN PRINCIPAL (CON AUTH)
+// PWA ESTIMATOR - APLICACIÓN PRINCIPAL (CORREGIDO)
 // ═══════════════════════════════════════════════════════════════
 
 console.log('🔧 PWA Estimator app.js cargado');
@@ -7,7 +7,7 @@ console.log('🔧 PWA Estimator app.js cargado');
 window.app = {
   pantallaActual: 'estimador-screen',
   esAdmin: false,
-  ADMIN_PASSWORD: 'TU_CONTRASENA_AQUI', // ⚠️ CAMBIA ESTO
+  ADMIN_PASSWORD: 'TU_CONTRASEÑA_AQUI', // ⚠️ CAMBIA ESTO
   
   // ─────────────────────────────────────────────────────────────
   // INICIALIZAR APP
@@ -16,10 +16,8 @@ window.app = {
     try {
       console.log('🔧 PWA Estimator iniciando...');
       
-      // ⚠️ FORZAR SCROLL AL INICIO AL CARGAR
+      // Forzar scroll al inicio
       window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
       
       // Cargar tema guardado
       this.cargarTemaGuardado();
@@ -79,7 +77,7 @@ window.app = {
       modal.classList.add('active');
     }
     
-    // Ocultar sidebars hasta que se decida
+    // Ocultar AMBOS sidebars
     const sidebarAdmin = document.getElementById('sidebar-admin');
     const sidebarCliente = document.getElementById('sidebar-cliente');
     
@@ -94,14 +92,12 @@ window.app = {
     
     // Forzar scroll al inicio
     window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     
     console.log('🔐 Login mostrado');
   },
   
   // ─────────────────────────────────────────────────────────────
-  // VERIFICAR ADMIN
+  // VERIFICAR ADMIN (CORREGIDO - MODAL SÍ SE OCULTA)
   // ─────────────────────────────────────────────────────────────
   verificarAdmin: function() {
     const passwordInput = document.getElementById('admin-password');
@@ -114,13 +110,32 @@ window.app = {
       
       this.esAdmin = true;
       
-      // Ocultar login
+      // ⚠️ OCULTAR LOGIN COMPLETAMENTE
       const modal = document.getElementById('login-modal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+        modal.style.visibility = 'hidden';
+        modal.style.opacity = '0';
+        modal.classList.remove('active');
+      }
       
-      // Mostrar sidebar admin
-      document.getElementById('sidebar-admin')?.style.setProperty('display', 'flex');
-      document.getElementById('sidebar-cliente')?.style.setProperty('display', 'none');
+      // ⚠️ MOSTRAR SIDEBAR ADMIN
+      const sidebarAdmin = document.getElementById('sidebar-admin');
+      const sidebarCliente = document.getElementById('sidebar-cliente');
+      
+      if (sidebarAdmin) {
+        sidebarAdmin.style.setProperty('display', 'flex', 'important');
+        sidebarAdmin.classList.add('visible');
+      }
+      if (sidebarCliente) {
+        sidebarCliente.style.setProperty('display', 'none', 'important');
+        sidebarCliente.classList.remove('visible');
+      }
+      
+      // ⚠️ FORZAR SCROLL AL INICIO
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
       
       // Cargar diagnósticos
       this.cargarDiagnosticos();
@@ -135,17 +150,23 @@ window.app = {
       
     } else {
       // Contraseña incorrecta
-      passwordInput?.classList.add('error');
+      if (passwordInput) {
+        passwordInput.classList.add('error');
+        passwordInput.style.borderColor = 'var(--rose)';
+      }
       this.mostrarToast('❌ Contraseña incorrecta', 'error');
       
       setTimeout(() => {
-        passwordInput?.classList.remove('error');
+        if (passwordInput) {
+          passwordInput.classList.remove('error');
+          passwordInput.style.borderColor = '';
+        }
       }, 2000);
     }
   },
   
   // ─────────────────────────────────────────────────────────────
-  // ENTRAR COMO CLIENTE (CORREGIDO)
+  // ENTRAR COMO CLIENTE (CORREGIDO - MODAL SÍ SE OCULTA)
   // ─────────────────────────────────────────────────────────────
   entrarComoCliente: function() {
     this.esAdmin = false;
@@ -153,22 +174,23 @@ window.app = {
     // ⚠️ OCULTAR LOGIN COMPLETAMENTE
     const modal = document.getElementById('login-modal');
     if (modal) {
-      modal.style.display = 'none';
+      modal.style.setProperty('display', 'none', 'important');
       modal.style.visibility = 'hidden';
       modal.style.opacity = '0';
+      modal.classList.remove('active');
     }
     
     // ⚠️ MOSTRAR SIDEBAR CLIENTE
-    const sidebarCliente = document.getElementById('sidebar-cliente');
     const sidebarAdmin = document.getElementById('sidebar-admin');
+    const sidebarCliente = document.getElementById('sidebar-cliente');
     
-    if (sidebarCliente) {
-      sidebarCliente.style.setProperty('display', 'flex', 'important');
-      sidebarCliente.style.visibility = 'visible';
-      sidebarCliente.style.opacity = '1';
-    }
     if (sidebarAdmin) {
       sidebarAdmin.style.setProperty('display', 'none', 'important');
+      sidebarAdmin.classList.remove('visible');
+    }
+    if (sidebarCliente) {
+      sidebarCliente.style.setProperty('display', 'flex', 'important');
+      sidebarCliente.classList.add('visible');
     }
     
     // ⚠️ FORZAR SCROLL AL INICIO
@@ -179,19 +201,13 @@ window.app = {
     // ⚠️ MOSTRAR PANTALLA ESTIMADOR
     this.mostrarPantalla('estimador-screen');
     
-    // ⚠️ ESPERAR UN MOMENTO Y VERIFICAR QUE EL CONTENIDO SEA VISIBLE
+    // ⚠️ ESPERAR Y VERIFICAR QUE EL CONTENIDO SEA VISIBLE
     setTimeout(() => {
       const estimadorScreen = document.getElementById('estimador-screen');
       if (estimadorScreen) {
         estimadorScreen.style.display = 'block';
         estimadorScreen.classList.add('active');
         estimadorScreen.scrollIntoView({ top: 0, behavior: 'auto' });
-      }
-      
-      // Verificar que el contenido tenga padding correcto
-      const content = document.querySelector('.content');
-      if (content) {
-        content.style.paddingTop = '28px';
       }
     }, 100);
     
@@ -216,8 +232,23 @@ window.app = {
         this.esAdmin = true;
         
         // Mostrar sidebar admin
-        document.getElementById('sidebar-admin')?.style.setProperty('display', 'flex');
-        document.getElementById('sidebar-cliente')?.style.setProperty('display', 'none');
+        const sidebarAdmin = document.getElementById('sidebar-admin');
+        const sidebarCliente = document.getElementById('sidebar-cliente');
+        
+        if (sidebarAdmin) {
+          sidebarAdmin.style.setProperty('display', 'flex', 'important');
+          sidebarAdmin.classList.add('visible');
+        }
+        if (sidebarCliente) {
+          sidebarCliente.style.setProperty('display', 'none', 'important');
+          sidebarCliente.classList.remove('visible');
+        }
+        
+        // NO mostrar login
+        const modal = document.getElementById('login-modal');
+        if (modal) {
+          modal.style.setProperty('display', 'none', 'important');
+        }
         
         console.log('✅ Sesión admin válida');
         return;
@@ -226,8 +257,6 @@ window.app = {
     
     // Sesión inválida o expirada
     this.esAdmin = false;
-    localStorage.removeItem('pwa_estimator_admin');
-    localStorage.removeItem('pwa_estimator_admin_time');
   },
   
   // ─────────────────────────────────────────────────────────────
@@ -262,11 +291,13 @@ window.app = {
     // Ocultar todas las pantallas
     document.querySelectorAll('.screen').forEach(screen => {
       screen.classList.remove('active');
+      screen.style.display = 'none';
     });
     
     // Mostrar pantalla seleccionada
     const pantalla = document.getElementById(pantallaId);
     if (pantalla) {
+      pantalla.style.display = 'block';
       pantalla.classList.add('active');
       this.pantallaActual = pantallaId;
       
@@ -317,26 +348,34 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // CARGAR DIAGNÓSTICOS
+  // CARGAR DIAGNÓSTICOS (CON MANEJO DE ERRORES)
   // ─────────────────────────────────────────────────────────────
   cargarDiagnosticos: async function() {
     try {
+      if (!window.db?.diagnosticos) {
+        console.warn('⚠️ DB no disponible');
+        return;
+      }
+      
       if (window.adminDiagnosticos && typeof window.adminDiagnosticos.cargar === 'function') {
         await window.adminDiagnosticos.cargar();
       }
       
       // Actualizar badge del menú
-      if (window.db?.diagnosticos) {
-        const count = await window.db.diagnosticos.count();
-        const badge = document.getElementById('menu-badge-diagnosticos');
-        if (badge) {
-          badge.textContent = count;
-          badge.style.display = count > 0 ? 'inline-block' : 'none';
-        }
+      const count = await window.db.diagnosticos.count();
+      const badge = document.getElementById('menu-badge-diagnosticos');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-block' : 'none';
       }
       
     } catch (error) {
       console.error('❌ Error cargando diagnósticos:', error);
+      
+      // Si es error de permisos, mostrar mensaje útil
+      if (error.code === 'permission-denied') {
+        this.mostrarToast('🔐 Error de permisos en Firebase. Revisa las reglas de Firestore.', 'error');
+      }
     }
   },
   
@@ -344,7 +383,6 @@ window.app = {
   // CONFIGURAR NAVEGACIÓN
   // ─────────────────────────────────────────────────────────────
   configurarNavegacion: function() {
-    // Navegación por teclado
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.mostrarPantalla('estimador-screen');
