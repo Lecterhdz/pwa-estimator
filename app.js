@@ -7,7 +7,7 @@ console.log('🔧 PWA Estimator app.js cargado');
 window.app = {
   pantallaActual: 'estimador-screen',
   esAdmin: false,
-  ADMIN_PASSWORD: 'TU_CONTRASEÑA_AQUI', // ⚠️ CAMBIA ESTO
+  ADMIN_PASSWORD: 'TU_CONTRASENA_AQUI', // ⚠️ CAMBIA ESTO
   
   // ─────────────────────────────────────────────────────────────
   // INICIALIZAR APP
