@@ -9,23 +9,40 @@ window.adminDiagnosticos = {
   diagnosticosCache: [],
   
   // ─────────────────────────────────────────────────────────────
-  // CARGAR DIAGNÓSTICOS
+  // CARGAR DIAGNÓSTICOS (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   cargar: async function() {
     try {
       if (!window.db?.diagnosticos) {
-        console.error('❌ Firebase/DB no disponible');
+        console.error('❌ DB no disponible');
         this.renderTabla([]);
         return;
       }
       
+      // Obtener diagnósticos de Firebase/IndexedDB
       const diagnosticos = await window.db.diagnosticos
         .orderBy('timestamp', 'desc')
         .limit(100)
         .toArray();
       
-      this.diagnosticosCache = diagnosticos;
-      this.renderTabla(diagnosticos);
+      console.log('🔍 Diagnósticos cargados:', diagnosticos.length);
+      
+      // Filtrar eliminados (soft delete)
+      const diagnosticosValidos = diagnosticos.filter(d => !d.eliminado);
+      
+      // ⚠️ GUARDAR EN CACHE CON LOS IDs CORRECTOS
+      this.diagnosticosCache = diagnosticosValidos.map(d => ({
+        ...d,
+        // Asegurar que el ID esté disponible
+        id: d.id || d._id || d.documentId
+      }));
+      
+      console.log('🔍 Cache actualizado:', this.diagnosticosCache.length);
+      
+      // Renderizar tabla
+      this.renderTabla(diagnosticosValidos);
+      
+      // Actualizar badge del menú
       this.actualizarBadge();
       
     } catch (error) {
@@ -97,9 +114,11 @@ window.adminDiagnosticos = {
                 class="tabla-btn status" title="Cambiar status">
                 📊
               </button>
-              <button onclick="adminDiagnosticos.eliminarDiagnostico('${d.id}')" 
-                class="tabla-btn delete" title="Eliminar" style="background:var(--rose);color:white;">
-                🗑️
+              <button onclick="adminDiagnosticos.rechazarDiagnostico('${d.id}')" 
+                class="tabla-btn delete" 
+                title="Marcar como rechazada" 
+                style="background:var(--rose);color:white;">
+                ❌
               </button>
             </div>
           </td>
@@ -108,53 +127,94 @@ window.adminDiagnosticos = {
     }).join('');
   },
   // ─────────────────────────────────────────────────────────────
-  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO)
+  // RECHAZAR DIAGNÓSTICO (CAMBIAR STATUS A RECHAZADA)
   // ─────────────────────────────────────────────────────────────
-  cambiarStatus: async function(id) {
+  rechazarDiagnostico: async function(id) {
+    const confirmar = confirm(
+      `❌ ¿Marcar este diagnóstico como RECHAZADO?\n\n` +
+      `El cliente será notificado que su cotización no fue aceptada.\n\n` +
+      `ID: ${id}`
+    );
+    
+    if (!confirmar) return;
+    
     try {
-      // Buscar en el cache primero (más rápido)
-      let diagnostico = this.diagnosticosCache.find(d => d.id === id);
+      let diagnostico = this.diagnosticosCache?.find(d => (d.id || d._id) === id);
       
-      // Si no está en cache, buscar en DB
-      if (!diagnostico && window.db?.diagnosticos) {
+      if (!diagnostico && window.db?.diagnosticos?.get) {
         diagnostico = await window.db.diagnosticos.get(id);
       }
       
       if (!diagnostico) {
-        console.error('❌ Diagnóstico no encontrado:', id);
-        alert('❌ Diagnóstico no encontrado\n\nID: ' + id);
+        alert('❌ Diagnóstico no encontrado');
+        return;
+      }
+      
+      // Actualizar status
+      diagnostico.status = 'rechazada';
+      diagnostico.fechaRechazo = new Date().toISOString();
+      diagnostico.motivoRechazo = prompt('Motivo del rechazo (opcional):') || 'No especificado';
+      
+      await window.db.diagnosticos.add(diagnostico);
+      
+      alert('✅ Diagnóstico marcado como RECHAZADO');
+      this.cargar();
+      
+    } catch (error) {
+      console.error('❌ Error rechazando diagnóstico:', error);
+      alert('❌ Error: ' + error.message);
+    }
+  },
+  // ─────────────────────────────────────────────────────────────
+  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO)
+  // ─────────────────────────────────────────────────────────────
+  cambiarStatus: async function(id) {
+    try {
+      console.log('🔍 Cambiar status - ID buscado:', id);
+      
+      // Buscar en el cache PRIMERO (más rápido y confiable)
+      let diagnostico = this.diagnosticosCache?.find(d => {
+        const docId = d.id || d._id || d.documentId;
+        return docId === id;
+      });
+      
+      console.log('🔍 Encontrado en cache:', !!diagnostico);
+      
+      // Si no está en cache, buscar en DB directamente
+      if (!diagnostico && window.db?.diagnosticos?.get) {
+        console.log('🔍 Buscando en DB...');
+        diagnostico = await window.db.diagnosticos.get(id);
+        console.log('🔍 Resultado de DB get():', diagnostico ? 'Encontrado' : 'No encontrado');
+      }
+      
+      if (!diagnostico) {
+        console.error('❌ Diagnóstico no encontrado. ID:', id);
+        console.error('🔍 Cache disponible:', this.diagnosticosCache?.map(d => d.id));
+        alert('❌ Diagnóstico no encontrado\n\nID: ' + id + '\n\nIntenta recargar la página.');
         return;
       }
       
       const statusActual = diagnostico.status || 'pendiente';
       
-      // Mostrar menú de status
+      // Mostrar menú de status (incluye RECHAZADA)
+      const opciones = `1️⃣ Pendiente\n2️⃣ Contactado\n3️⃣ ✅ Aceptada\n4️⃣ 🔄 En Proceso\n5️⃣ 🎉 Entregada\n6️⃣ ❌ Rechazada`;
+      
       const nuevoStatus = prompt(
-        `Cambiar status del proyecto:\n\n` +
-        `Status actual: ${statusActual.toUpperCase()}\n\n` +
-        `Escribe el número del nuevo status:\n` +
-        `1️⃣ Pendiente\n` +
-        `2️⃣ Contactado\n` +
-        `3️⃣ Cotización Aceptada\n` +
-        `4️⃣ En Proceso\n` +
-        `5️⃣ Entregada\n` +
-        `6️⃣ Cancelada`,
-        statusActual === 'pendiente' ? '1' : 
-        statusActual === 'contactado' ? '2' : 
-        statusActual === 'aceptada' ? '3' : 
-        statusActual === 'en_proceso' ? '4' : 
-        statusActual === 'entregada' ? '5' : '6'
+        `Cambiar estado del proyecto:\n\n` +
+        `Estado actual: ${statusActual.toUpperCase()}\n\n` +
+        `Escribe el número del nuevo estado:\n${opciones}`,
+        this.getStatusNumber(statusActual)
       );
       
       if (!nuevoStatus) return;
       
       const statusMap = {
         '1': 'pendiente',
-        '2': 'contactado',
+        '2': 'contactado', 
         '3': 'aceptada',
         '4': 'en_proceso',
         '5': 'entregada',
-        '6': 'cancelada'
+        '6': 'rechazada'  // ← NUEVO
       };
       
       const statusFinal = statusMap[nuevoStatus] || statusActual;
@@ -165,14 +225,10 @@ window.adminDiagnosticos = {
         const semanas = diagnostico.resultado?.semanas || '8';
         const fechaSugerida = this.calcularFechaEntrega(semanas);
         const fechaInput = prompt(
-          `Ingresa la fecha estimada de entrega:\n\n` +
-          `Formato: YYYY-MM-DD\n` +
-          `Sugerida (según cotización): ${fechaSugerida}`,
+          `Fecha estimada de entrega:\n\nFormato: YYYY-MM-DD\nSugerida: ${fechaSugerida}`,
           fechaSugerida
         );
-        if (fechaInput) {
-          fechaEntrega = fechaInput;
-        }
+        if (fechaInput) fechaEntrega = fechaInput;
       }
       
       // Si es "Entregada", mostrar checklist
@@ -182,30 +238,27 @@ window.adminDiagnosticos = {
           `□ Código fuente entregado\n` +
           `□ Documentación completa\n` +
           `□ PWA instalable funcionando\n` +
-          `□ Credenciales de acceso entregadas\n` +
+          `□ Credenciales entregadas\n` +
           `□ Pago final recibido\n\n` +
-          `¿Confirmas que todos los items están completados?`
+          `¿Confirmas que todo está completado?`
         );
-        
-        if (!checklist) {
-          alert('⚠️ Completa el checklist antes de marcar como entregada');
-          return;
-        }
+        if (!checklist) return;
       }
       
-      // Actualizar en DB
+      // Actualizar documento
       diagnostico.status = statusFinal;
       diagnostico.fechaEntrega = fechaEntrega;
       diagnostico.fechaStatusChange = new Date().toISOString();
       
+      // Guardar en DB (add() actualiza si ya existe el ID en Firebase)
       await window.db.diagnosticos.add(diagnostico);
       
       console.log('✅ Status actualizado:', statusFinal);
-      alert(`✅ Status actualizado a: ${statusFinal.toUpperCase()}`);
+      alert(`✅ Estado actualizado a: ${this.getStatusLabel(statusFinal)}`);
       
       // Actualizar cache local
-      const index = this.diagnosticosCache.findIndex(d => d.id === id);
-      if (index !== -1) {
+      const index = this.diagnosticosCache?.findIndex(d => (d.id || d._id) === id);
+      if (index !== -1 && this.diagnosticosCache) {
         this.diagnosticosCache[index] = diagnostico;
       }
       
@@ -278,7 +331,7 @@ window.adminDiagnosticos = {
       'aceptada': '<span class="badge-status aceptada">✅ Cotización Aceptada</span>',
       'en_proceso': `<span class="badge-status en_proceso">🔄 En Proceso${fechaEntrega ? ' (' + this.getDiasRestantes(fechaEntrega) + ')' : ''}</span>`,
       'entregada': '<span class="badge-status entregada">🎉 Entregada</span>',
-      'cancelada': '<span class="badge-status cancelada">❌ Cancelada</span>'
+      'rechazada': '<span class="badge-status cancelada">❌ Rechazada</span>'
     };
     
     return badges[status] || badges['pendiente'];
