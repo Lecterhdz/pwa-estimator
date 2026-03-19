@@ -414,75 +414,71 @@ window.adminDiagnosticos = {
       `Completados: ${checklist.filter(c => c.done).length}/${checklist.length}`
     );
   },  
-  // ─────────────────────────────────────────────────────────────
-  // VER DETALLE DEL DIAGNÓSTICO
-  // ─────────────────────────────────────────────────────────────
-  verDetalle: function(id) {
-    const diagnostico = this.diagnosticosCache.find(d => d.id === id);
+// ─────────────────────────────────────────────────────────────
+// VER DETALLE DEL DIAGNÓSTICO (CORREGIDO)
+// ─────────────────────────────────────────────────────────────
+verDetalle: async function(id) {
+  try {
+    // Buscar en cache primero
+    let diagnostico = this.diagnosticosCache.find(d => d.id === id);
+    
+    // Si no está en cache, buscar en DB
+    if (!diagnostico && window.db?.diagnosticos) {
+      diagnostico = await window.db.diagnosticos.get(id);
+    }
+    
     if (!diagnostico) {
       alert('❌ Diagnóstico no encontrado');
       return;
     }
     
-    const disciplinas = diagnostico.seleccion?.disciplinas?.map(d => {
-      const disc = window.estimadorPWA?.disciplinas?.[d];
-      return disc ? disc.nombre : d;
-    }).join(', ') || 'Ninguna';
-    
-    const capacidades = diagnostico.seleccion?.capacidades?.map(c => {
-      const cap = window.estimadorPWA?.capacidades?.[c];
-      return cap ? cap.nombre : c;
-    }).join(', ') || 'Ninguna';
-    
-    const componentes = diagnostico.seleccion?.componentes?.join(', ') || 'Ninguno';
+    const disciplinas = (diagnostico.seleccion?.tipoPWA ? [estimadorPWA.tiposPWA[diagnostico.seleccion.tipoPWA]?.nombre] : [])
+      .concat(diagnostico.seleccion?.modulos?.map(m => estimadorPWA.modulos[m]?.nombre) || [])
+      .filter(Boolean)
+      .join(', ') || 'Ninguna';
     
     const detalle = `
-╔═══════════════════════════════════════════════════════════╗
-║  DIAGNÓSTICO PWA - ${diagnostico.cliente?.empresa || 'Cliente'}
-╚═══════════════════════════════════════════════════════════╝
-
-📋 DATOS DEL CLIENTE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Empresa: ${diagnostico.cliente?.empresa || '—'}
-Email: ${diagnostico.cliente?.email || '—'}
-Teléfono: ${diagnostico.cliente?.telefono || '—'}
-Industria: ${diagnostico.cliente?.industria || '—'}
-Fecha: ${new Date(diagnostico.fecha || diagnostico.timestamp).toLocaleString('es-MX')}
-
-🎯 RESULTADO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Nivel: ${diagnostico.resultado?.nivel || '—'}
-Puntos: ${diagnostico.resultado?.puntos || 0}
-Inversión Estimada: ${diagnostico.resultado?.rangoPrecio?.texto || '—'}
-Tiempo: ${diagnostico.resultado?.semanas || '—'}
-Lead Score: ${diagnostico.meta?.leadScore || 0}/100
-
-⚙️ DISCIPLINAS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${disciplinas}
-
-💰 MOTOR DE COTIZACIÓN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Activado: ${diagnostico.seleccion?.motorCotizacion ? '✅ Sí' : '❌ No'}
-Componentes: ${componentes}
-Exportación: ${diagnostico.seleccion?.exportacion || 'Ninguna'}
-
-🚀 CAPACIDADES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${capacidades}
-
-📝 MENSAJE DE CIERRE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${diagnostico.resultado?.mensajeCierre || '—'}
-
-📊 ESTADO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Solicitud Enviada: ${diagnostico.solicitudEnviada ? '✅ Sí' : '❌ No'}
-Contactado: ${diagnostico.contactado ? '✅ Sí' : '❌ No'}
-    `;
-    
-    console.log(detalle);
-    alert(detalle);
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  DIAGNÓSTICO PWA - ${diagnostico.cliente?.empresa || 'Cliente'}
+  ╚═══════════════════════════════════════════════════════════╝
+  
+  📋 DATOS DEL CLIENTE
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Empresa: ${diagnostico.cliente?.empresa || '—'}
+  Email: ${diagnostico.cliente?.email || '—'}
+  Teléfono: ${diagnostico.cliente?.telefono || '—'}
+  Industria: ${diagnostico.cliente?.industria || '—'}
+  Fecha: ${new Date(diagnostico.fecha || diagnostico.timestamp).toLocaleString('es-MX')}
+  
+  🎯 RESULTADO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Nivel: ${diagnostico.resultado?.nivel || '—'}
+  Puntos: ${diagnostico.resultado?.puntos || 0}
+  Inversión Estimada: ${diagnostico.resultado?.rangoPrecio?.texto || '—'}
+  Tiempo: ${diagnostico.resultado?.semanas || '—'} semanas
+  Lead Score: ${diagnostico.meta?.leadScore || 0}/100
+  
+  ⚙️ CONFIGURACIÓN
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Tipo PWA: ${estimadorPWA.tiposPWA[diagnostico.seleccion?.tipoPWA]?.nombre || '—'}
+  Base: ${estimadorPWA.bases[diagnostico.seleccion?.base]?.nombre || '—'}
+  Módulos: ${disciplinas}
+  
+  📊 ESTADO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Solicitud Enviada: ${diagnostico.solicitudEnviada ? '✅ Sí' : '❌ No'}
+  Contactado: ${diagnostico.contactado ? '✅ Sí' : '❌ No'}
+  Status: ${diagnostico.status?.toUpperCase() || 'PENDIENTE'}
+  Eliminado: ${diagnostico.eliminado ? '✅ Sí' : '❌ No'}
+      `;
+      
+      console.log(detalle);
+      alert(detalle);
+      
+    } catch (error) {
+      console.error('❌ Error viendo detalle:', error);
+      alert('❌ Error: ' + error.message);
+    }
   },
   
   // ─────────────────────────────────────────────────────────────
