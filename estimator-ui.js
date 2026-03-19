@@ -302,10 +302,17 @@ window.estimatorUI = {
     console.log('⬅️ Regresando al paso:', paso);
   },  
   // ─────────────────────────────────────────────────────────────
-  // FINALIZAR (CORREGIDO)
+  // FINALIZAR DIAGNÓSTICO (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   finalizarDiagnostico: async function() {
     try {
+      // Actualizar todas las selecciones antes de calcular
+      this.actualizarSeleccionTipoPWA();
+      this.actualizarSeleccionBase();
+      this.actualizarSeleccionModulos();
+      this.actualizarSeleccionEscala();
+      
+      // Datos de contacto
       const datosCliente = {
         empresa: document.getElementById('cliente-empresa')?.value || 'No especificada',
         email: document.getElementById('cliente-email')?.value || '',
@@ -313,34 +320,39 @@ window.estimatorUI = {
         industria: document.getElementById('cliente-industria')?.value || ''
       };
       
-      if (datosCliente.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datosCliente.email)) {
-        alert('⚠️ Ingresa un email válido');
+      // Validar email
+      if (!datosCliente.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datosCliente.email)) {
+        alert('⚠️ Ingresa un email válido para contactarte');
+        document.getElementById('cliente-email')?.focus();
         return;
       }
       
+      // Calcular estimación
       const calculo = estimadorPWA.calcular(this.seleccion);
       if (!calculo.exito) {
-        alert('⚠️ Error calculando estimación');
+        alert('⚠️ Error calculando estimación: ' + calculo.error);
         return;
       }
       
       const resultado = calculo.datos;
       const mensaje = estimadorPWA.generarMensajeCierre(resultado);
       
-      // ✅ CORREGIDO: Verificar elemento antes de asignar
+      // Mostrar mensaje
       const elMensaje = document.getElementById('mensaje-cierre');
       if (elMensaje) {
         elMensaje.textContent = mensaje;
       }
       
+      // Guardar en Firebase/LocalStorage
       const guardado = await estimadorPWA.guardarDiagnostico(datosCliente, this.seleccion, resultado);
       
       if (guardado.exito) {
-        alert('✅ ¡Diagnóstico guardado!\n\nTe contactaremos pronto.');
+        alert('✅ ¡Diagnóstico guardado!\n\nTe contactaremos en 24-48 horas con la cotización formal.');
       } else if (guardado.fallback) {
         alert('✅ Diagnóstico guardado localmente.');
       }
       
+      // Mostrar resultado
       this.mostrarResultado(resultado, mensaje);
       
     } catch (error) {
