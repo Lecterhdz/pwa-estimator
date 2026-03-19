@@ -108,13 +108,21 @@ window.adminDiagnosticos = {
     }).join('');
   },
   // ─────────────────────────────────────────────────────────────
-  // CAMBIAR STATUS DEL PROYECTO (NUEVA FUNCIÓN)
+  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   cambiarStatus: async function(id) {
     try {
-      const diagnostico = await window.db.diagnosticos.get(id);
+      // Buscar en el cache primero (más rápido)
+      let diagnostico = this.diagnosticosCache.find(d => d.id === id);
+      
+      // Si no está en cache, buscar en DB
+      if (!diagnostico && window.db?.diagnosticos) {
+        diagnostico = await window.db.diagnosticos.get(id);
+      }
+      
       if (!diagnostico) {
-        alert('❌ Diagnóstico no encontrado');
+        console.error('❌ Diagnóstico no encontrado:', id);
+        alert('❌ Diagnóstico no encontrado\n\nID: ' + id);
         return;
       }
       
@@ -155,14 +163,15 @@ window.adminDiagnosticos = {
       let fechaEntrega = diagnostico.fechaEntrega;
       if (statusFinal === 'en_proceso') {
         const semanas = diagnostico.resultado?.semanas || '8';
-        const fechaSugerida = prompt(
+        const fechaSugerida = this.calcularFechaEntrega(semanas);
+        const fechaInput = prompt(
           `Ingresa la fecha estimada de entrega:\n\n` +
           `Formato: YYYY-MM-DD\n` +
-          `Sugerida (según cotización): ${this.calcularFechaEntrega(semanas)}`,
-          this.calcularFechaEntrega(semanas)
+          `Sugerida (según cotización): ${fechaSugerida}`,
+          fechaSugerida
         );
-        if (fechaSugerida) {
-          fechaEntrega = fechaSugerida;
+        if (fechaInput) {
+          fechaEntrega = fechaInput;
         }
       }
       
@@ -193,6 +202,12 @@ window.adminDiagnosticos = {
       
       console.log('✅ Status actualizado:', statusFinal);
       alert(`✅ Status actualizado a: ${statusFinal.toUpperCase()}`);
+      
+      // Actualizar cache local
+      const index = this.diagnosticosCache.findIndex(d => d.id === id);
+      if (index !== -1) {
+        this.diagnosticosCache[index] = diagnostico;
+      }
       
       // Recargar tabla
       this.cargar();
