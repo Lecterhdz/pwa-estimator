@@ -166,7 +166,7 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // ENTRAR COMO CLIENTE (CORREGIDO - MODAL SÍ SE OCULTA)
+  // ENTRAR COMO CLIENTE (CORREGIDO - LAYOUT)
   // ─────────────────────────────────────────────────────────────
   entrarComoCliente: function() {
     this.esAdmin = false;
@@ -198,15 +198,20 @@ window.app = {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // ⚠️ MOSTRAR PANTALLA ESTIMADOR
-    this.mostrarPantalla('estimador-screen');
-    
-    // ⚠️ ESPERAR Y VERIFICAR QUE EL CONTENIDO SEA VISIBLE
+    // ⚠️ ESPERAR QUE EL LAYOUT SE ACTUALICE
     setTimeout(() => {
+      // Forzar reflow
+      document.body.offsetHeight;
+      
+      // Mostrar pantalla estimador
+      this.mostrarPantalla('estimador-screen');
+      
+      // Verificar que el contenido esté en su lugar
+      const content = document.querySelector('.content');
       const estimadorScreen = document.getElementById('estimador-screen');
-      if (estimadorScreen) {
-        estimadorScreen.style.display = 'block';
-        estimadorScreen.classList.add('active');
+      
+      if (content && estimadorScreen) {
+        content.scrollLeft = 0;
         estimadorScreen.scrollIntoView({ top: 0, behavior: 'auto' });
       }
     }, 100);
