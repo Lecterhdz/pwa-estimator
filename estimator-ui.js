@@ -30,54 +30,50 @@ window.estimatorUI = {
   // AGREGAR EVENT LISTENERS (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   agregarListeners: function() {
-    // Disciplinas - Click en el label/card completo
-    document.querySelectorAll('.disciplina-card').forEach(card => {
+    
+    // PASO 1: Tipo de PWA (Radio buttons)
+    document.querySelectorAll('input[name="tipoPWA"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        this.actualizarSeleccionTipoPWA();
+        this.actualizarPuntosVisibles();
+      });
+    });
+    
+    // PASO 2: Base funcional (Radio buttons)
+    document.querySelectorAll('input[name="base"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        this.actualizarSeleccionBase();
+        this.actualizarPuntosVisibles();
+      });
+    });
+    
+    // PASO 3: Módulos (Checkboxes - múltiples)
+    document.querySelectorAll('input[name="modulo"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        this.actualizarSeleccionModulos();
+        this.actualizarPuntosVisibles();
+      });
+    });
+    
+    // PASO 4: Escala (Radio buttons)
+    document.querySelectorAll('input[name="escala"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        this.actualizarSeleccionEscala();
+        this.actualizarPuntosVisibles();
+      });
+    });
+    
+    // También permitir click en las cards completas (no solo en el radio)
+    document.querySelectorAll('.tipo-pwa-card, .base-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        // Prevenir propagación pero NO el default del checkbox
-        const checkbox = card.querySelector('input[type="checkbox"]');
-        if (checkbox) {
-          // Toggle manual del checkbox
-          checkbox.checked = !checkbox.checked;
+        // Si el click NO fue directamente en el input, buscarlo y marcarlo
+        if (e.target.tagName !== 'INPUT') {
+          const radio = card.querySelector('input[type="radio"]');
+          if (radio) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
+          }
         }
-        
-        // Actualizar estado
-        this.actualizarSeleccionDisciplinas();
-        this.actualizarPuntosVisibles();
-        this.actualizarBadgeMultidisciplinario();
-      });
-    });
-    
-    // Componentes del motor
-    document.querySelectorAll('input[name="componente"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        this.actualizarSeleccionComponentes();
-        this.actualizarPuntosVisibles();
-      });
-    });
-    
-    // Motor cotización toggle
-    const motorToggle = document.getElementById('motor-cotizacion-toggle');
-    if (motorToggle) {
-      motorToggle.addEventListener('change', (e) => {
-        this.seleccion.motorCotizacion = e.target.checked;
-        this.actualizarPuntosVisibles();
-      });
-    }
-    
-    // Exportación Neodata
-    const neodataSync = document.getElementById('neodata-sync');
-    if (neodataSync) {
-      neodataSync.addEventListener('change', (e) => {
-        this.seleccion.exportacionNeodata = e.target.checked;
-        this.actualizarPuntosVisibles();
-      });
-    }
-    
-    // Capacidades
-    document.querySelectorAll('input[name="capacidad"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        this.actualizarSeleccionCapacidades();
-        this.actualizarPuntosVisibles();
       });
     });
   },
@@ -104,44 +100,83 @@ window.estimatorUI = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // ACTUALIZAR PUNTOS (CORREGIDO - SIN OPTIONAL CHAINING EN ASIGNACIÓN)
+  // ACTUALIZAR SELECCIÓN (CORREGIDO PARA RADIO + CHECKBOX)
+  // ─────────────────────────────────────────────────────────────
+  actualizarSeleccionTipoPWA: function() {
+    const seleccionado = document.querySelector('input[name="tipoPWA"]:checked');
+    this.seleccion.tipoPWA = seleccionado ? seleccionado.value : null;
+  },
+  
+  actualizarSeleccionBase: function() {
+    const seleccionado = document.querySelector('input[name="base"]:checked');
+    this.seleccion.base = seleccionado ? seleccionado.value : null;
+  },
+  
+  actualizarSeleccionModulos: function() {
+    this.seleccion.modulos = Array.from(
+      document.querySelectorAll('input[name="modulo"]:checked')
+    ).map(cb => cb.value);
+  },
+  
+  actualizarSeleccionEscala: function() {
+    const seleccionado = document.querySelector('input[name="escala"]:checked');
+    this.seleccion.escala = seleccionado ? seleccionado.value : null;
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // ACTUALIZAR PUNTOS VISIBLES (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   actualizarPuntosVisibles: function() {
-    let puntos = 20;
+    let puntos = 0;
     
-    this.seleccion.disciplinas.forEach(discId => {
-      const disc = estimadorPWA.disciplinas[discId];
-      if (disc) puntos += disc.puntos;
-    });
-    
-    if (this.seleccion.disciplinas.length >= 3) puntos += 30;
-    
-    if (this.seleccion.motorCotizacion) {
-      puntos += estimadorPWA.motorCotizacion.base.puntos;
+    // Tipo de PWA (1 selección)
+    if (this.seleccion.tipoPWA && estimadorPWA.tiposPWA[this.seleccion.tipoPWA]) {
+      puntos += estimadorPWA.tiposPWA[this.seleccion.tipoPWA].puntos;
     }
     
-    if (this.seleccion.exportacionNeodata) puntos += 15;
-    else if (this.seleccion.exportacionExcel) puntos += 5;
-    
-    this.seleccion.capacidades.forEach(capId => {
-      const cap = estimadorPWA.capacidades[capId];
-      if (cap) puntos += cap.puntos;
-    });
-    
-    // ✅ CORREGIDO: Verificar elemento antes de asignar
-    const resumen = document.getElementById('puntos-resumen');
-    if (resumen) {
-      resumen.textContent = `${puntos} puntos estimados`;
+    // Base funcional (1 selección)
+    if (this.seleccion.base && estimadorPWA.bases[this.seleccion.base]) {
+      puntos += estimadorPWA.bases[this.seleccion.base].puntos;
     }
     
-    let nivel = 'Starter';
-    if (puntos > 90) nivel = 'Professional';
-    if (puntos > 140) nivel = 'Enterprise';
-    if (puntos > 200) nivel = 'Elite';
+    // Módulos (múltiples selecciones)
+    if (this.seleccion.modulos && Array.isArray(this.seleccion.modulos)) {
+      this.seleccion.modulos.forEach(modId => {
+        if (estimadorPWA.modulos[modId]) {
+          puntos += estimadorPWA.modulos[modId].puntos;
+        }
+      });
+    }
     
+    // Escala de usuarios
+    if (this.seleccion.escala) {
+      const escala = estimadorPWA.escalas.find(e => e.etiqueta.includes(this.seleccion.escala));
+      if (escala) {
+        puntos += escala.puntos;
+      }
+    }
+    
+    // Actualizar resumen visual
+    const elPuntos = document.getElementById('puntos-resumen');
     const elNivel = document.getElementById('nivel-resumen');
-    if (elNivel) {
-      elNivel.textContent = `Nivel: ${nivel}`;
+    const elPrecio = document.getElementById('precio-resumen');
+    const elTiempo = document.getElementById('tiempo-resumen');
+    
+    if (elPuntos) elPuntos.textContent = `${puntos} pts`;
+    
+    // Determinar nivel
+    const rango = estimadorPWA.rangosPrecio.find(r => puntos <= r.maxPuntos);
+    if (rango && elNivel) {
+      elNivel.textContent = rango.nivel;
+      elNivel.className = `resumen-value nivel-${rango.nivel.toLowerCase().replace(' ', '-')}`;
+    }
+    
+    if (rango && elPrecio) {
+      elPrecio.textContent = rango.rangoPrecio?.texto || 'Por definir';
+    }
+    
+    if (rango && elTiempo) {
+      elTiempo.textContent = rango.semanas || 'Por definir';
     }
   },
   
@@ -188,15 +223,16 @@ window.estimatorUI = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // SIGUIENTE PASO (CORREGIDO)
+  // SIGUIENTE PASO (CORREGIDO PARA RADIO BUTTONS)
   // ─────────────────────────────────────────────────────────────
   siguientePaso: function(paso) {
-    // Validar paso 1: Al menos una disciplina seleccionada
+    
+    // Validar PASO 1: Tipo de PWA (radio button - solo 1 selección)
     if (paso === 2) {
-      this.actualizarSeleccionDisciplinas();
+      const tipoPWASeleccionado = document.querySelector('input[name="tipoPWA"]:checked');
       
-      if (!this.seleccion.disciplinas || this.seleccion.disciplinas.length === 0) {
-        alert('⚠️ Selecciona al menos una disciplina para continuar');
+      if (!tipoPWASeleccionado) {
+        alert('⚠️ Selecciona al menos una industria para continuar');
         
         // Highlight visual del error
         const paso1 = document.getElementById('paso-1');
@@ -209,8 +245,48 @@ window.estimatorUI = {
         
         return;
       }
+      
+      // Guardar selección
+      this.seleccion.tipoPWA = tipoPWASeleccionado.value;
     }
     
+    // Validar PASO 2: Funcionalidad Base (radio button - solo 1 selección)
+    if (paso === 3) {
+      const baseSeleccionada = document.querySelector('input[name="base"]:checked');
+      
+      if (!baseSeleccionada) {
+        alert('⚠️ Selecciona una funcionalidad principal para continuar');
+        
+        const paso2 = document.getElementById('paso-2');
+        if (paso2) {
+          paso2.style.animation = 'shake 0.5s ease';
+          setTimeout(() => {
+            paso2.style.animation = '';
+          }, 500);
+        }
+        
+        return;
+      }
+      
+      // Guardar selección
+      this.seleccion.base = baseSeleccionada.value;
+    }
+    
+    // Validar PASO 3: Módulos (checkboxes - múltiples selecciones permitidas)
+    if (paso === 4) {
+      // Guardar módulos seleccionados (puede ser 0 o más)
+      this.seleccion.modulos = Array.from(
+        document.querySelectorAll('input[name="modulo"]:checked')
+      ).map(cb => cb.value);
+      
+      // Guardar escala
+      const escalaSeleccionada = document.querySelector('input[name="escala"]:checked');
+      if (escalaSeleccionada) {
+        this.seleccion.escala = escalaSeleccionada.value;
+      }
+    }
+    
+    // Ir al siguiente paso
     this.irAPaso(paso);
   },
   // ─────────────────────────────────────────────────────────────
