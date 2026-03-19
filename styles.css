@@ -2094,3 +2094,29 @@ body.tema-claro .topbar-btn.ghost {
     display: none !important;
   }
 }
+/* ══════════════════════════════════════ HAMBURGER BUTTON ══════════════════════════════════════ */
+.hamburger-btn {
+  display: none !important;
+  padding: 8px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: var(--ink) !important;
+  font-size: 20px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+/* ══════════════════════════════════════ SIDEBAR OVERLAY ══════════════════════════════════════ */
+.sidebar-overlay {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 150 !important;
+}
+
+.sidebar-overlay.active {
+  display: block !important;
+}
