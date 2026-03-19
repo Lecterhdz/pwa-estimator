@@ -187,15 +187,30 @@ window.estimatorUI = {
     this.pasoActual = paso;
   },
   
+  // ─────────────────────────────────────────────────────────────
+  // SIGUIENTE PASO (CORREGIDO)
+  // ─────────────────────────────────────────────────────────────
   siguientePaso: function(paso) {
-    if (paso === 2 && this.seleccion.disciplinas.length === 0) {
-      alert('⚠️ Selecciona al menos una disciplina');
-      return;
+    // Validar paso 1: Al menos una disciplina seleccionada
+    if (paso === 2) {
+      this.actualizarSeleccionDisciplinas();
+      
+      if (!this.seleccion.disciplinas || this.seleccion.disciplinas.length === 0) {
+        alert('⚠️ Selecciona al menos una disciplina para continuar');
+        
+        // Highlight visual del error
+        const paso1 = document.getElementById('paso-1');
+        if (paso1) {
+          paso1.style.animation = 'shake 0.5s ease';
+          setTimeout(() => {
+            paso1.style.animation = '';
+          }, 500);
+        }
+        
+        return;
+      }
     }
-    this.irAPaso(paso);
-  },
-  
-  anteriorPaso: function(paso) {
+    
     this.irAPaso(paso);
   },
   
