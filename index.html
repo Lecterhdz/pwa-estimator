@@ -22,33 +22,35 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- ══════════════════════════════════════ LOGIN MODAL ══════════════════════════════════════ -->
+<!-- Login Modal (CORREGIDO) -->
 <div id="login-modal" class="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:var(--white);padding:40px;border-radius:var(--radius-lg);max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    
     <div style="text-align:center;margin-bottom:24px;">
       <div style="font-size:48px;margin-bottom:12px;">🔐</div>
-      <h2 style="color:var(--ink);font-size:20px;font-weight:700;margin-bottom:8px;">Acceso Admin</h2>
-      <p style="color:var(--ink4);font-size:13px;">Solo personal autorizado</p>
+      <h2 style="color:var(--ink);font-size:20px;font-weight:700;margin-bottom:8px;">Acceso</h2>
+      <p style="color:var(--ink4);font-size:13px;">Selecciona tu tipo de acceso</p>
     </div>
     
     <div style="display:flex;flex-direction:column;gap:16px;">
       <div>
-        <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Contraseña</label>
+        <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Contraseña Admin</label>
         <input type="password" id="admin-password" class="f-input" placeholder="Ingresa tu contraseña" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);font-size:14px;">
       </div>
       
       <button onclick="app.verificarAdmin()" class="topbar-btn primary" style="width:100%;justify-content:center;">
-        🔑 Ingresar como Admin
+        🔑 Entrar como Admin
       </button>
       
       <button onclick="app.entrarComoCliente()" class="topbar-btn ghost" style="width:100%;justify-content:center;">
-        👤 Continuar como Cliente
+        👤 Entrar como Cliente
       </button>
     </div>
     
-    <div style="margin-top:20px;padding:12px;background:var(--amber-l);border-radius:8px;border-left:3px solid var(--amber);">
+    <div style="margin-top:20px;padding:12px;background:var(--blue-l);border-radius:8px;border-left:3px solid var(--blue);">
       <div style="font-size:11px;color:var(--ink4);">
-        ⚠️ <strong>Nota:</strong> Como cliente solo podrás usar el estimador. El admin puede ver todas las solicitudes.
+        💡 <strong>Cliente:</strong> Solo podrás usar el estimador para cotizar tu PWA.<br>
+        🔐 <strong>Admin:</strong> Acceso completo para ver solicitudes y diagnósticos.
       </div>
     </div>
   </div>
