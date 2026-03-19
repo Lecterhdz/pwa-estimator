@@ -297,9 +297,16 @@ body.tema-claro .topbar-btn.ghost {
 }
 /* ══════════════════════════════════════ LOGIN MODAL ══════════════════════════════════════ */
 .login-modal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.login-modal.active {
+  display: flex !important;
 }
 
 .login-modal input.error {
@@ -313,7 +320,26 @@ body.tema-claro .topbar-btn.ghost {
   75% { transform: translateX(5px); }
 }
 
-/* Sidebar transición */
+/* Sidebar */
 .sidebar {
-  transition: display 0.3s ease;
+  display: none !important;
+}
+
+.sidebar.visible {
+  display: flex !important;
+}
+
+/* Pantallas */
+.screen {
+  display: none !important;
+}
+
+.screen.active {
+  display: block !important;
+}
+
+/* Content padding */
+.content {
+  padding: 28px 32px !important;
+  min-height: calc(100vh - 60px) !important;
 }
