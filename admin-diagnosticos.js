@@ -370,7 +370,35 @@ window.adminDiagnosticos = {
       alert('❌ Error: ' + error.message);
     }
   },
-  
+  // ─────────────────────────────────────────────────────────────
+  // VER CHECKLIST DE ENTREGA (NUEVA FUNCIÓN)
+  // ─────────────────────────────────────────────────────────────
+  verChecklistEntrega: async function(id) {
+    const diagnostico = await window.db.diagnosticos.get(id);
+    if (!diagnostico) {
+      alert('❌ Diagnóstico no encontrado');
+      return;
+    }
+    
+    const checklist = [
+      { item: 'Código fuente entregado', done: diagnostico.checklist?.codigo || false },
+      { item: 'Documentación completa', done: diagnostico.checklist?.documentacion || false },
+      { item: 'PWA instalable funcionando', done: diagnostico.checklist?.pwa || false },
+      { item: 'Credenciales de acceso entregadas', done: diagnostico.checklist?.credenciales || false },
+      { item: 'Pago final recibido', done: diagnostico.checklist?.pago || false },
+      { item: 'Capacitación al cliente', done: diagnostico.checklist?.capacitacion || false }
+    ];
+    
+    const checklistTexto = checklist.map((c, i) => 
+      `${c.done ? '✅' : '❌'} ${i + 1}. ${c.item}`
+    ).join('\n');
+    
+    alert(
+      `📋 Checklist de Entrega - ${diagnostico.cliente?.empresa || 'Cliente'}\n\n` +
+      `${checklistTexto}\n\n` +
+      `Completados: ${checklist.filter(c => c.done).length}/${checklist.length}`
+    );
+  },  
   // ─────────────────────────────────────────────────────────────
   // VER DETALLE DEL DIAGNÓSTICO
   // ─────────────────────────────────────────────────────────────
