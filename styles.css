@@ -34,7 +34,55 @@
   --font: 'Outfit', sans-serif;
   --mono: 'JetBrains Mono', monospace;
 }
+/* ══════════════════════════════════════ CORRECCIONES DE LAYOUT ══════════════════════════════════════ */
 
+/* Forzar que el contenido siempre sea visible */
+.screen.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.screen {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Content siempre con padding correcto */
+.content {
+  padding: 28px 32px !important;
+  min-height: calc(100vh - 60px) !important;
+}
+
+/* Login modal siempre encima */
+.login-modal {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.login-modal.active {
+  display: flex !important;
+}
+
+/* Sidebar siempre visible cuando corresponde */
+.sidebar {
+  display: none !important;
+}
+
+.sidebar.visible {
+  display: flex !important;
+}
+
+/* Reset de scroll */
+html, body {
+  scroll-behavior: auto !important;
+  overflow-x: hidden !important;
+}
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body {
