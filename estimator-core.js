@@ -4,98 +4,68 @@
 
 console.log('🧮 estimador-core.js cargado');
 
-// ─────────────────────────────────────────────────────────────
-// CALCULAR PUNTOS Y NIVEL
-// ─────────────────────────────────────────────────────────────
 window.estimadorPWA.calcular = function(seleccion) {
-  let puntos = 20; // Base de Plataforma PWA
+  let puntos = 0;
   let detalles = {
-    disciplinas: [],
-    bonoMultidisciplinario: false,
-    motorCotizacion: null,
-    capacidades: [],
+    tipoPWA: null,
+    base: null,
+    modulos: [],
+    escalas: null,
     totalPuntos: 0
   };
   
-  try {
-    // 1️⃣ DISCIPLINAS DE INGENIERÍA
-    if (seleccion.disciplinas && Array.isArray(seleccion.disciplinas)) {
-      seleccion.disciplinas.forEach(discId => {
-        if (estimadorPWA.disciplinas[discId]) {
-          const disc = estimadorPWA.disciplinas[discId];
-          puntos += disc.puntos;
-          detalles.disciplinas.push(disc);
-        }
-      });
-      
-      // ⚠️ BONO MULTIDISCIPLINARIO: +30 pts si ≥3 disciplinas
-      if (detalles.disciplinas.length >= 3) {
-        puntos += 30;
-        detalles.bonoMultidisciplinario = true;
-      }
-    }
-    
-    // 2️⃣ MOTOR DE COTIZACIÓN UNIVERSAL
-    if (seleccion.motorCotizacion) {
-      const motor = estimadorPWA.motorCotizacion.base;
-      puntos += motor.puntos;
-      detalles.motorCotizacion = { ...motor, componentes: [] };
-      
-      if (seleccion.componentes && Array.isArray(seleccion.componentes)) {
-        seleccion.componentes.forEach(compId => {
-          if (estimadorPWA.motorCotizacion.componentes[compId]) {
-            detalles.motorCotizacion.componentos.push(
-              estimadorPWA.motorCotizacion.componentes[compId]
-            );
-          }
-        });
-      }
-      
-      if (seleccion.exportacionNeodata) {
-        puntos += estimadorPWA.motorCotizacion.exportacion.neodata.puntos;
-        detalles.motorCotizacion.exportacion = 'Neodata + Excel';
-      } else if (seleccion.exportacionExcel) {
-        puntos += estimadorPWA.motorCotizacion.exportacion.excel.puntos;
-        detalles.motorCotizacion.exportacion = 'Excel';
-      }
-    }
-    
-    // 3️⃣ CAPACIDADES PRO
-    if (seleccion.capacidades && Array.isArray(seleccion.capacidades)) {
-      seleccion.capacidades.forEach(capId => {
-        if (estimadorPWA.capacidades[capId]) {
-          const cap = estimadorPWA.capacidades[capId];
-          puntos += cap.puntos;
-          detalles.capacidades.push(cap);
-        }
-      });
-    }
-    
-    // 4️⃣ ESCALA + PERSONALIZACIÓN
-    if (seleccion.escala) puntos += seleccion.escala.puntos || 0;
-    if (seleccion.personalizacion) puntos += seleccion.personalizacion.puntos || 0;
-    
-    // 5️⃣ CALCULAR NIVEL Y RANGO DE PRECIO
-    const rango = estimadorPWA.rangosPrecio.find(r => puntos <= r.maxPuntos);
-    
-    detalles.totalPuntos = puntos;
-    detalles.nivel = rango?.nivel || 'Custom';
-    detalles.rangoPrecio = rango ? {
-      min: rango.precioMin,
-      max: rango.precioMax,
-      texto: rango.precioMax 
-        ? `$${rango.precioMin.toLocaleString('es-MX')} – $${rango.precioMax.toLocaleString('es-MX')} MXN`
-        : `Desde $${rango.precioMin.toLocaleString('es-MX')} MXN`
-    } : null;
-    detalles.semanas = rango?.semanas || 'Por definir';
-    
-    console.log('✅ Estimación calculada:', detalles);
-    return { exito: true, datos: detalles };
-    
-  } catch (error) {
-    console.error('❌ Error calculando estimación:', error);
-    return { exito: false, error: error.message };
+  // 1️⃣ Tipo de PWA
+  if (seleccion.tipoPWA && estimadorPWA.tiposPWA[seleccion.tipoPWA]) {
+    const tipo = estimadorPWA.tiposPWA[seleccion.tipoPWA];
+    puntos += tipo.puntos;
+    detalles.tipoPWA = tipo;
   }
+  
+  // 2️⃣ Base funcional
+  if (seleccion.base && estimadorPWA.bases[seleccion.base]) {
+    const base = estimadorPWA.bases[seleccion.base];
+    puntos += base.puntos;
+    detalles.base = base;
+  }
+  
+  // 3️⃣ Módulos adicionales
+  if (seleccion.modulos && Array.isArray(seleccion.modulos)) {
+    seleccion.modulos.forEach(modId => {
+      if (estimadorPWA.modulos[modId]) {
+        const mod = estimadorPWA.modulos[modId];
+        puntos += mod.puntos;
+        detalles.modulos.push(mod);
+      }
+    });
+  }
+  
+  // 4️⃣ Escala de usuarios
+  if (seleccion.escala) {
+    const escala = estimadorPWA.escalas.find(e => 
+      seleccion.escala >= e.min && seleccion.escala <= e.max
+    );
+    if (escala) {
+      puntos += escala.puntos;
+      detalles.escala = escala;
+    }
+  }
+  
+  // 5️⃣ Calcular nivel y precio
+  const rango = estimadorPWA.rangosPrecio.find(r => puntos <= r.maxPuntos);
+  
+  detalles.totalPuntos = puntos;
+  detalles.nivel = rango?.nivel || 'Custom';
+  detalles.rangoPrecio = rango ? {
+    min: rango.precioMin,
+    max: rango.precioMax,
+    texto: rango.precioMax 
+      ? `$${rango.precioMin.toLocaleString('es-MX')} – $${rango.precioMax.toLocaleString('es-MX')} MXN`
+      : `Desde $${rango.precioMin.toLocaleString('es-MX')} MXN`,
+    descripcion: rango.descripcion
+  } : null;
+  detalles.semanas = rango?.semanas || 'Por definir';
+  
+  return { exito: true, datos: detalles };
 };
 
 // ─────────────────────────────────────────────────────────────
