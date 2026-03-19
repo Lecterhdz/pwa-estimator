@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="description" content="Estimador PWA Modular - Cotiza tu proyecto en minutos">
+<title>Estimador PWA Modular</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="favicon.png">
+
+<!-- Fuentes -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Estilos -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- ══════════════════════════════════════ LOGIN MODAL ══════════════════════════════════════ -->
+<div id="login-modal" class="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--white);padding:40px;border-radius:var(--radius-lg);max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:48px;margin-bottom:12px;">🔐</div>
+      <h2 style="color:var(--ink);font-size:20px;font-weight:700;margin-bottom:8px;">Acceso Admin</h2>
+      <p style="color:var(--ink4);font-size:13px;">Solo personal autorizado</p>
+    </div>
+    
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Contraseña</label>
+        <input type="password" id="admin-password" class="f-input" placeholder="Ingresa tu contraseña" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);font-size:14px;">
+      </div>
+      
+      <button onclick="app.verificarAdmin()" class="topbar-btn primary" style="width:100%;justify-content:center;">
+        🔑 Ingresar como Admin
+      </button>
+      
+      <button onclick="app.entrarComoCliente()" class="topbar-btn ghost" style="width:100%;justify-content:center;">
+        👤 Continuar como Cliente
+      </button>
+    </div>
+    
+    <div style="margin-top:20px;padding:12px;background:var(--amber-l);border-radius:8px;border-left:3px solid var(--amber);">
+      <div style="font-size:11px;color:var(--ink4);">
+        ⚠️ <strong>Nota:</strong> Como cliente solo podrás usar el estimador. El admin puede ver todas las solicitudes.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ LAYOUT PRINCIPAL ══════════════════════════════════════ -->
+<div class="layout">
+  
+  <!-- Sidebar (SOLO ADMIN) -->
+  <aside class="sidebar" id="sidebar-admin" style="display:none;">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🔧</div>
+      <div class="logo-text">
+        <strong>PWA Estimator</strong>
+        <span>Panel Admin</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">Principal</div>
+    <button class="nav-item active" onclick="app.mostrarPantalla('estimador-screen')">
+      <span class="nav-icon">📊</span>
+      <span>Estimador</span>
+    </button>
+    <button class="nav-item" onclick="app.mostrarPantalla('admin-diagnosticos-screen')">
+      <span class="nav-icon">📋</span>
+      <span>Diagnósticos</span>
+      <span class="nav-badge" id="menu-badge-diagnosticos">0</span>
+    </button>
+    
+    <div class="sidebar-footer">
+      <button class="btn-salir" onclick="app.cerrarSesionAdmin()">
+        <span>🗑️</span>
+        <span>Cerrar Sesión Admin</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar (CLIENTE - Limitado) -->
+  <aside class="sidebar" id="sidebar-cliente" style="display:none;">
+    
+    <!-- Topbar -->
+    <aside class="sidebar" id="sidebar-cliente" style="display:none;">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🔧</div>
+        <div class="logo-text">
+          <strong>PWA Estimator</strong>
+          <span>Cotizador</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn ghost" onclick="app.toggleTema()" title="Cambiar tema     claro/oscuro" style="min-width:44px;padding:8px;">
+          🌓
+        </button>
+        <button class="topbar-btn primary" onclick="app.mostrarPantalla('estimador-screen')">
+          <span>➕</span>
+          <span>Nuevo Diagnóstico</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-section">Herramientas</div>
+    <button class="nav-item active" onclick="app.mostrarPantalla('estimador-screen')">
+      <span class="nav-icon">📊</span>
+      <span>Estimador PWA</span>
+    </button>
+    <div class="sidebar-footer">
+      <button class="btn-salir" onclick="app.mostrarLogin()">
+        <span>🔐</span>
+        <span>Acceso Admin</span>
+      </button>
+    </div>
+  </aside>
+    <!-- Content -->
+    <div class="content">
+      
+      <!-- ══════════════════════════════════════ ESTIMADOR PWA ══════════════════════════════════════ -->
+      <section id="estimador-screen" class="screen active">
+        
+        <!-- Header -->
+        <div style="margin-bottom:24px;">
+          <h1 style="font-size:28px;font-weight:800;color:var(--ink);margin-bottom:8px;">🔧 Estimador PWA Modular</h1>
+          <p style="color:var(--ink4);font-size:14px;">Configura las características de tu proyecto y obtén un estimado de inversión al instante.</p>
+        </div>
+
+        <!-- Progreso -->
+        <div style="display:flex;gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:8px;">
+          <div class="step active" data-paso="1" style="padding:8px 16px;background:var(--blue);color:white;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">1. Disciplinas</div>
+          <div class="step" data-paso="2" style="padding:8px 16px;background:var(--bg2);color:var(--ink3);border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">2. Motor Cotización</div>
+          <div class="step" data-paso="3" style="padding:8px 16px;background:var(--bg2);color:var(--ink3);border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">3. Capacidades</div>
+          <div class="step" data-paso="4" style="padding:8px 16px;background:var(--bg2);color:var(--ink3);border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">4. Datos</div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            
+            <!-- PASO 1: DISCIPLINAS -->
+            <div id="paso-1">
+              <h3 style="margin-bottom:20px;">⚙️ 1. Disciplinas de Ingeniería</h3>
+              <p style="color:var(--ink4);font-size:13px;margin-bottom:16px;">Seleccione las disciplinas requeridas para su proyecto PWA:</p>
+              
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                
+                <label style="position:relative;cursor:pointer;">
+                  <input type="checkbox" name="disciplina" value="electrica" style="position:absolute;opacity:0;">
+                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+                    <span style="font-size:2.5rem;display:block;margin-bottom:12px;">⚡</span>
+                    <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Eléctrica Industrial</h4>
+                    <p style="color:var(--ink4);font-size:11px;margin:0;">NOM, Arc Flash, Tierras, Iluminación</p>
+                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+15 pts</span>
+                  </div>
+                </label>
+
+                <label style="position:relative;cursor:pointer;">
+                  <input type="checkbox" name="disciplina" value="mecanica" style="position:absolute;opacity:0;">
+                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+                    <span style="font-size:2.5rem;display:block;margin-bottom:12px;">⚙️</span>
+                    <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Mecánica / HVAC</h4>
+                    <p style="color:var(--ink4);font-size:11px;margin:0;">Carga térmica, Bombas, Flujo de aire</p>
+                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+15 pts</span>
+                  </div>
+                </label>
+
+                <label style="position:relative;cursor:pointer;">
+                  <input type="checkbox" name="disciplina" value="civil" style="position:absolute;opacity:0;">
+                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+                    <span style="font-size:2.5rem;display:block;margin-bottom:12px;">🏗️</span>
+                    <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Civil / Estructural</h4>
+                    <p style="color:var(--ink4);font-size:11px;margin:0;">Cimentaciones, Estructuras, Levantamientos</p>
+                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+15 pts</span>
+                  </div>
+                </label>
+
+                <label style="position:relative;cursor:pointer;">
+                  <input type="checkbox" name="disciplina" value="seguridad" style="position:absolute;opacity:0;">
+                  <div style="padding:25px 20px;border:2px solid var(--border);border-radius:15px;background:var(--bg);transition:all 0.3s;">
+                    <span style="font-size:2.5rem;display:block;margin-bottom:12px;">🦺</span>
+                    <h4 style="color:var(--ink);font-size:14px;font-weight:700;margin-bottom:6px;">Seguridad STPS</h4>
+                    <p style="color:var(--ink4);font-size:11px;margin:0;">LOTO, IPER, Análisis de riesgo</p>
+                    <span style="display:inline-block;padding:3px 10px;background:var(--blue);color:white;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;">+12 pts</span>
+                  </div>
+                </label>
+
+              </div>
+              
+              <div id="badge-multidisciplinario" style="display:none;margin-top:16px;padding:10px 16px;background:var(--amber-l);border:1px solid var(--amber);border-radius:8px;color:var(--amber);font-size:12px;font-weight:600;"></div>
+              
+              <button onclick="estimatorUI.siguientePaso(2)" class="topbar-btn primary" style="margin-top:24px;">Continuar →</button>
+            </div>
+
+            <!-- PASO 2: MOTOR DE COTIZACIÓN -->
+            <div id="paso-2" style="display:none;">
+              <h3 style="margin-bottom:20px;">💰 2. Motor de Cotización Universal</h3>
+              
+              <div style="background:var(--blue-l);padding:20px;border-radius:12px;border:1px dashed var(--blue-m);margin-bottom:20px;">
+                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                  <input type="checkbox" id="motor-cotizacion-toggle" style="width:20px;height:20px;">
+                  <div>
+                    <strong style="color:var(--blue);font-size:14px;">Activar Motor de Cotización</strong>
+                    <div style="font-size:12px;color:var(--ink4);">Cotiza materiales, mano de obra, servicios y estudios técnicos (+25 pts)</div>
+                  </div>
+                </label>
+              </div>
+              
+              <div id="motor-componentes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px;">
+                <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer;">
+                  <input type="checkbox" name="componente" value="materiales" style="width:16px;height:16px;">
+                  <span style="font-size:13px;color:var(--ink3);">🧱 Materiales</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer;">
+                  <input type="checkbox" name="componente" value="mano_obra" style="width:16px;height:16px;">
+                  <span style="font-size:13px;color:var(--ink3);">👷 Mano de Obra</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer;">
+                  <input type="checkbox" name="componente" value="servicios" style="width:16px;height:16px;">
+                  <span style="font-size:13px;color:var(--ink3);">🧠 Servicios</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer;">
+                  <input type="checkbox" name="componente" value="estudios" style="width:16px;height:16px;">
+                  <span style="font-size:13px;color:var(--ink3);">📊 Estudios</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer;">
+                  <input type="checkbox" name="componente" value="viaticos" style="width:16px;height:16px;">
+                  <span style="font-size:13px;color:var(--ink3);">🚚 Viáticos</span>
+                </label>
+              </div>
+              
+              <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border-radius:12px;">
+                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                  <input type="checkbox" id="neodata-sync" style="width:18px;height:18px;">
+                  <span style="font-size:13px;color:var(--ink);">Exportación a Neodata / Excel (+15 pts)</span>
+                </label>
+              </div>
+              
+              <div style="display:flex;gap:10px;margin-top:24px;">
+                <button onclick="estimatorUI.anteriorPaso(1)" class="topbar-btn ghost">← Atrás</button>
+                <button onclick="estimatorUI.siguientePaso(3)" class="topbar-btn primary">Continuar →</button>
+              </div>
+            </div>
+
+            <!-- PASO 3: CAPACIDADES -->
+            <div id="paso-3" style="display:none;">
+              <h3 style="margin-bottom:20px;">🚀 3. Capacidades Avanzadas</h3>
+              
+              <div style="display:grid;gap:12px;">
+                <label style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
+                  <input type="checkbox" name="capacidad" value="offline" style="width:18px;height:18px;">
+                  <div>
+                    <strong style="color:var(--ink);font-size:13px;">Modo Offline Completo</strong>
+                    <div style="font-size:11px;color:var(--ink4);">Trabajar sin conexión, sincronización automática (+30 pts)</div>
+                  </div>
+                </label>
+                
+                <label style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
+                  <input type="checkbox" name="capacidad" value="cloudSync" style="width:18px;height:18px;">
+                  <div>
+                    <strong style="color:var(--ink);font-size:13px;">Sincronización en Nube</strong>
+                    <div style="font-size:11px;color:var(--ink4);">Backup automático, multi-dispositivo (+25 pts)</div>
+                  </div>
+                </label>
+                
+                <label style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
+                  <input type="checkbox" name="capacidad" value="erp" style="width:18px;height:18px;">
+                  <div>
+                    <strong style="color:var(--ink);font-size:13px;">Integración con ERP</strong>
+                    <div style="font-size:11px;color:var(--ink4);">SAP, Oracle, NetSuite (+40 pts)</div>
+                  </div>
+                </label>
+              </div>
+              
+              <div style="display:flex;gap:10px;margin-top:24px;">
+                <button onclick="estimatorUI.anteriorPaso(2)" class="topbar-btn ghost">← Atrás</button>
+                <button onclick="estimatorUI.siguientePaso(4)" class="topbar-btn primary">Continuar →</button>
+              </div>
+            </div>
+
+            <!-- PASO 4: DATOS DE CONTACTO -->
+            <div id="paso-4" style="display:none;">
+              <h3 style="margin-bottom:20px;">📋 4. Datos de Contacto</h3>
+              
+              <div style="display:grid;gap:16px;max-width:500px;">
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Empresa</label>
+                  <input type="text" id="cliente-empresa" class="f-input" placeholder="Nombre de tu empresa" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Email *</label>
+                  <input type="email" id="cliente-email" class="f-input" placeholder="tu@email.com" required style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Teléfono</label>
+                  <input type="tel" id="cliente-telefono" class="f-input" placeholder="55-1234-5678" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Industria</label>
+                  <select id="cliente-industria" class="f-input" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+                    <option value="">Selecciona una opción</option>
+                    <option value="Electrico">Eléctrico</option>
+                    <option value="Mecanico">Mecánico / HVAC</option>
+                    <option value="Civil">Civil / Construcción</option>
+                    <option value="Seguridad">Seguridad Industrial</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div style="margin-top:24px;padding:16px;background:var(--bg2);border-radius:12px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                  <span style="color:var(--ink3);font-size:13px;">Puntos estimados:</span>
+                  <span id="puntos-resumen" style="color:var(--blue);font-weight:700;font-family:var(--mono);">20 pts</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="color:var(--ink3);font-size:13px;">Nivel estimado:</span>
+                  <span id="nivel-resumen" style="color:var(--green);font-weight:700;">Starter</span>
+                </div>
+              </div>
+              
+              <div style="display:flex;gap:10px;margin-top:24px;">
+                <button onclick="estimatorUI.anteriorPaso(3)" class="topbar-btn ghost">← Atrás</button>
+                <button onclick="estimatorUI.finalizarDiagnostico()" class="topbar-btn primary">✅ Finalizar Diagnóstico</button>
+              </div>
+            </div>
+
+            <!-- PASO RESULTADO -->
+            <div id="paso-resultado" style="display:none;">
+              <div style="text-align:center;padding:20px;background:var(--green-l);border-radius:var(--radius);border:1px solid var(--green);margin-bottom:24px;">
+                <div style="font-size:48px;margin-bottom:8px;">✅</div>
+                <h3 style="color:var(--green);margin:0;">Diagnóstico Completado</h3>
+              </div>
+              
+              <div id="diagnostico-contenido" style="background:var(--bg);padding:20px;border-radius:var(--radius);margin-bottom:24px;"></div>
+              
+              <div id="mensaje-cierre" style="background:var(--blue-l);padding:16px;border-radius:12px;border:1px solid var(--blue-m);color:var(--blue);font-size:13px;margin-bottom:24px;"></div>
+              
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <button onclick="estimatorUI.descargarPDF()" class="topbar-btn ghost">📄 Descargar PDF</button>
+                <button onclick="estimatorUI.solicitarDemo()" class="topbar-btn primary">📅 Solicitar Demo</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════ ADMIN DIAGNÓSTICOS ══════════════════════════════════════ -->
+      <section id="admin-diagnosticos-screen" class="screen">
+        <div style="margin-bottom:24px;">
+          <h1 style="font-size:28px;font-weight:800;color:var(--ink);margin-bottom:8px;">📋 Diagnósticos Recibidos</h1>
+          <p style="color:var(--ink4);font-size:14px;">Revisa y gestiona los diagnósticos enviados por los clientes.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Lista de Diagnósticos</div>
+            <button onclick="adminDiagnosticos.exportarCSV()" class="topbar-btn ghost">📥 Exportar CSV</button>
+          </div>
+          <div class="card-body">
+            
+            <!-- Filtros -->
+            <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+              <select id="filtro-nivel" onchange="adminDiagnosticos.filtrar()" style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+                <option value="">Todos los niveles</option>
+                <option value="Enterprise">Enterprise</option>
+                <option value="Professional">Professional</option>
+                <option value="Starter">Starter</option>
+              </select>
+              <select id="filtro-industria" onchange="adminDiagnosticos.filtrar()" style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+                <option value="">Todas las industrias</option>
+                <option value="Electrico">Eléctrico</option>
+                <option value="Mecanico">Mecánico / HVAC</option>
+                <option value="Civil">Civil</option>
+                <option value="Seguridad">Seguridad Industrial</option>
+              </select>
+              <input type="date" id="filtro-fecha" onchange="adminDiagnosticos.filtrar()" style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);">
+            </div>
+            
+            <!-- Tabla de diagnósticos -->
+            <div style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <thead>
+                  <tr style="background:var(--bg);">
+                    <th style="padding:12px;text-align:left;">Fecha</th>
+                    <th style="padding:12px;text-align:left;">Empresa</th>
+                    <th style="padding:12px;text-align:left;">Industria</th>
+                    <th style="padding:12px;text-align:left;">Nivel</th>
+                    <th style="padding:12px;text-align:left;">Puntos</th>
+                    <th style="padding:12px;text-align:left;">Lead Score</th>
+                    <th style="padding:12px;text-align:left;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-diagnosticos">
+                  <tr><td colspan="7" style="padding:20px;text-align:center;color:var(--ink4);">Cargando diagnósticos...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPTS EXTERNOS
+     ═══════════════════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPTS DE LA APP
+     ═══════════════════════════════════════════════════════════════ -->
+<script src="config-firebase.js"></script>
+<script src="db.js"></script>
+<script src="estimator-config.js"></script>
+<script src="estimator-core.js"></script>
+<script src="estimator-firebase.js"></script>
+<script src="estimator-ui.js"></script>
+<script src="admin-diagnosticos.js"></script>
+<script src="app.js"></script>
+<!-- Notificación Toast -->
+<div id="toast" style="display:none;position:fixed;bottom:20px;right:20px;background:var(--green);color:white;padding:16px 24px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:9999;font-size:13px;font-weight:600;animation:slideIn 0.3s ease;"></div>
+
+<style>
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+</style>
+</body>
+</html>
