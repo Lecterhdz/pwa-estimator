@@ -1675,3 +1675,118 @@ body.tema-claro .topbar-btn.ghost {
     grid-template-columns: 1fr;
   }
 }
+/* ══════════════════════════════════════ STATUS BADGES ══════════════════════════════════════ */
+.badge-status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-status.pendiente {
+  background: var(--bg2);
+  color: var(--ink4);
+}
+
+.badge-status.contactado {
+  background: var(--blue-l);
+  color: var(--blue);
+}
+
+.badge-status.aceptada {
+  background: var(--green-l);
+  color: var(--green);
+}
+
+.badge-status.en_proceso {
+  background: var(--amber-l);
+  color: var(--amber);
+}
+
+.badge-status.entregada {
+  background: var(--teal-l);
+  color: var(--teal);
+}
+
+.badge-status.cancelada {
+  background: var(--rose-l);
+  color: var(--rose);
+}
+
+/* ══════════════════════════════════════ BOTONES DE ACCIÓN ══════════════════════════════════════ */
+.tabla-acciones {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tabla-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabla-btn.contactar {
+  background: var(--blue);
+  color: white;
+}
+
+.tabla-btn.contactar:hover {
+  background: #1d4ed8;
+}
+
+.tabla-btn.ver {
+  background: var(--bg2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+
+.tabla-btn.ver:hover {
+  background: var(--border2);
+}
+
+.tabla-btn.status {
+  background: var(--indigo);
+  color: white;
+}
+
+.tabla-btn.status:hover {
+  background: #6d28d9;
+}
+
+.tabla-btn.delete {
+  background: var(--rose);
+  color: white;
+}
+
+.tabla-btn.delete:hover {
+  background: #dc2626;
+}
+
+/* ══════════════════════════════════════ BADGE SOLICITUD ══════════════════════════════════════ */
+.badge-solicitud {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.badge-solicitud.enviada {
+  background: var(--green-l);
+  color: var(--green);
+  font-weight: 600;
+}
+
+.badge-solicitud.pendiente {
+  background: var(--bg2);
+  color: var(--ink4);
+}
