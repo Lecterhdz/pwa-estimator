@@ -121,21 +121,55 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // ENTRAR COMO CLIENTE
+  // ENTRAR COMO CLIENTE (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   entrarComoCliente: function() {
     this.esAdmin = false;
     
-    // Ocultar login
+    // ⚠️ OCULTAR LOGIN COMPLETAMENTE
     const modal = document.getElementById('login-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.style.visibility = 'hidden';
+      modal.style.opacity = '0';
+    }
     
-    // Mostrar sidebar cliente
-    document.getElementById('sidebar-admin')?.style.setProperty('display', 'none');
-    document.getElementById('sidebar-cliente')?.style.setProperty('display', 'flex');
+    // ⚠️ MOSTRAR SIDEBAR CLIENTE
+    const sidebarCliente = document.getElementById('sidebar-cliente');
+    const sidebarAdmin = document.getElementById('sidebar-admin');
     
-    // Mostrar estimador
+    if (sidebarCliente) {
+      sidebarCliente.style.setProperty('display', 'flex', 'important');
+      sidebarCliente.style.visibility = 'visible';
+      sidebarCliente.style.opacity = '1';
+    }
+    if (sidebarAdmin) {
+      sidebarAdmin.style.setProperty('display', 'none', 'important');
+    }
+    
+    // ⚠️ FORZAR SCROLL AL INICIO
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // ⚠️ MOSTRAR PANTALLA ESTIMADOR
     this.mostrarPantalla('estimador-screen');
+    
+    // ⚠️ ESPERAR UN MOMENTO Y VERIFICAR QUE EL CONTENIDO SEA VISIBLE
+    setTimeout(() => {
+      const estimadorScreen = document.getElementById('estimador-screen');
+      if (estimadorScreen) {
+        estimadorScreen.style.display = 'block';
+        estimadorScreen.classList.add('active');
+        estimadorScreen.scrollIntoView({ top: 0, behavior: 'auto' });
+      }
+      
+      // Verificar que el contenido tenga padding correcto
+      const content = document.querySelector('.content');
+      if (content) {
+        content.style.paddingTop = '28px';
+      }
+    }, 100);
     
     this.mostrarToast('👤 Modo Cliente Activado', 'info');
     
