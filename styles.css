@@ -2116,7 +2116,12 @@ body.tema-claro .topbar-btn.ghost {
   backdrop-filter: blur(4px) !important;
   z-index: 150 !important;
 }
-
+/* En styles.css, agregar: */
+.badge-status.rechazada {
+  background: var(--rose-l);
+  color: var(--rose);
+  font-weight: 600;
+}
 .sidebar-overlay.active {
   display: block !important;
 }
