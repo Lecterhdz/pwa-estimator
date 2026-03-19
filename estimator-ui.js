@@ -27,25 +27,27 @@ window.estimatorUI = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // AGREGAR EVENT LISTENERS
+  // AGREGAR EVENT LISTENERS (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   agregarListeners: function() {
-    document.querySelectorAll('input[name="disciplina"]').forEach(cb => {
-      // Prevenir doble click
-      cb.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    // Disciplinas - Click en el label/card completo
+    document.querySelectorAll('.disciplina-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Prevenir propagación pero NO el default del checkbox
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        if (checkbox) {
+          // Toggle manual del checkbox
+          checkbox.checked = !checkbox.checked;
+        }
         
-        // Toggle manual
-        cb.checked = !cb.checked;
-        
-        // Disparar cambio
+        // Actualizar estado
         this.actualizarSeleccionDisciplinas();
         this.actualizarPuntosVisibles();
         this.actualizarBadgeMultidisciplinario();
       });
     });
     
+    // Componentes del motor
     document.querySelectorAll('input[name="componente"]').forEach(cb => {
       cb.addEventListener('change', () => {
         this.actualizarSeleccionComponentes();
@@ -53,6 +55,7 @@ window.estimatorUI = {
       });
     });
     
+    // Motor cotización toggle
     const motorToggle = document.getElementById('motor-cotizacion-toggle');
     if (motorToggle) {
       motorToggle.addEventListener('change', (e) => {
@@ -61,6 +64,7 @@ window.estimatorUI = {
       });
     }
     
+    // Exportación Neodata
     const neodataSync = document.getElementById('neodata-sync');
     if (neodataSync) {
       neodataSync.addEventListener('change', (e) => {
@@ -69,6 +73,7 @@ window.estimatorUI = {
       });
     }
     
+    // Capacidades
     document.querySelectorAll('input[name="capacidad"]').forEach(cb => {
       cb.addEventListener('change', () => {
         this.actualizarSeleccionCapacidades();
