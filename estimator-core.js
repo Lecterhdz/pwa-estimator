@@ -39,11 +39,12 @@ window.estimadorPWA.calcular = function(seleccion) {
     });
   }
   
-  // 4️⃣ Escala de usuarios
-  if (seleccion.escala) {
-    const escala = estimadorPWA.escalas.find(e => 
-      seleccion.escala >= e.min && seleccion.escala <= e.max
-    );
+    // 4️⃣ Escala de usuarios
+    if (seleccion.escala) {
+      const escala = estimadorPWA.escalas.find(e => 
+        seleccion.escala.includes(e.etiqueta.split(' ')[0]) || 
+        e.etiqueta.includes(seleccion.escala)
+      );
     if (escala) {
       puntos += escala.puntos;
       detalles.escala = escala;
