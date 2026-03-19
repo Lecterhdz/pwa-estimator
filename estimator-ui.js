@@ -306,11 +306,26 @@ window.estimatorUI = {
   // ─────────────────────────────────────────────────────────────
   finalizarDiagnostico: async function() {
     try {
-      // Actualizar todas las selecciones antes de calcular
+      // ⚠️ ACTUALIZAR TODAS LAS SELECCIONES ANTES DE CALCULAR
       this.actualizarSeleccionTipoPWA();
       this.actualizarSeleccionBase();
       this.actualizarSeleccionModulos();
       this.actualizarSeleccionEscala();
+      
+      console.log('🔍 Selección antes de calcular:', this.seleccion);
+      
+      // Validar que haya al menos tipoPWA y base
+      if (!this.seleccion.tipoPWA) {
+        alert('⚠️ Selecciona una industria en el Paso 1');
+        this.irAPaso(1);
+        return;
+      }
+      
+      if (!this.seleccion.base) {
+        alert('⚠️ Selecciona una funcionalidad principal en el Paso 2');
+        this.irAPaso(2);
+        return;
+      }
       
       // Datos de contacto
       const datosCliente = {
@@ -335,9 +350,15 @@ window.estimatorUI = {
       }
       
       const resultado = calculo.datos;
+      
+      console.log('🔍 Resultado del cálculo:', resultado);
+      
+      // Generar mensaje de cierre
       const mensaje = estimadorPWA.generarMensajeCierre(resultado);
       
-      // Mostrar mensaje
+      console.log('🔍 Mensaje de cierre:', mensaje);
+      
+      // Mostrar mensaje en UI
       const elMensaje = document.getElementById('mensaje-cierre');
       if (elMensaje) {
         elMensaje.textContent = mensaje;
@@ -352,7 +373,7 @@ window.estimatorUI = {
         alert('✅ Diagnóstico guardado localmente.');
       }
       
-      // Mostrar resultado
+      // Mostrar pantalla de resultado
       this.mostrarResultado(resultado, mensaje);
       
     } catch (error) {
