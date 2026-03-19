@@ -394,7 +394,28 @@ window.app = {
       }
     });
   },
-  
+  // ─────────────────────────────────────────────────────────────
+  // TOGGLE SIDEBAR (MÓVIL)
+  // ─────────────────────────────────────────────────────────────
+  toggleSidebar: function() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    if (sidebar) {
+      sidebar.classList.toggle('visible');
+    }
+    
+    if (overlay) {
+      overlay.classList.toggle('active');
+    }
+    
+    // Prevenir scroll del body cuando sidebar está abierto
+    if (sidebar?.classList.contains('visible')) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  },  
   // ─────────────────────────────────────────────────────────────
   // TOGGLE TEMA (CLARO/OSCURO)
   // ─────────────────────────────────────────────────────────────
