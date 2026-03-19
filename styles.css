@@ -677,6 +677,11 @@ body.tema-claro .topbar-btn.ghost {
   background: var(--bg2);
   color: var(--ink);
 }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
 /* ══════════════════════════════════════ CUANDO NO HAY SIDEBAR VISIBLE ══════════════════════════════════════ */
 .layout:has(.sidebar.visible) {
   grid-template-columns: 240px 1fr !important;
