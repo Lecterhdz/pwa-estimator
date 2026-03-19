@@ -479,37 +479,79 @@ input, select, textarea {
   background: var(--green);
 }
 
-/* ══════════════════════════════════════ LOGIN MODAL ══════════════════════════════════════ */
-.login-modal {
-  display: none !important;
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 9999 !important;
-  background: rgba(0, 0, 0, 0.8) !important;
-  backdrop-filter: blur(8px) !important;
-  align-items: center !important;
-  justify-content: center !important;
+/* ══════════════════════════════════════ LOGIN MODAL OPTIMIZADO ══════════════════════════════════════ */
+.login-modal-content {
+  background: var(--white);
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.login-modal.active {
-  display: flex !important;
+.login-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
 }
 
-.login-modal input.error {
-  border-color: var(--rose) !important;
-  animation: shake 0.5s ease;
+.login-modal-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
 }
 
-@keyframes shake {
-  0%, 100% { 
-    transform: translateX(0); 
-  }
-  25% { 
-    transform: translateX(-5px); 
-  }
-  75% { 
-    transform: translateX(5px); 
-  }
+.login-modal-header h2 {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.login-modal-header p {
+  color: var(--ink4);
+  font-size: 13px;
+}
+
+.login-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-modal-body .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-modal-body label {
+  display: block;
+  font-size: 12px;
+  color: var(--ink3);
+  font-weight: 600;
+}
+
+.login-modal-body .btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+.login-modal-info {
+  margin-top: 20px;
+  padding: 12px;
+  background: var(--blue-l);
+  border-radius: 8px;
+  border-left: 3px solid var(--blue);
+  font-size: 11px;
+  color: var(--ink4);
+  line-height: 1.6;
+}
+
+.login-modal-info div {
+  margin-bottom: 4px;
+}
+
+.login-modal-info div:last-child {
+  margin-bottom: 0;
 }
 
 /* ══════════════════════════════════════ TOAST NOTIFICATION ══════════════════════════════════════ */
