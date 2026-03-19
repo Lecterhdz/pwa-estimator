@@ -22,36 +22,34 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- Login Modal (CORREGIDO) -->
-<div id="login-modal" class="login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--white);padding:40px;border-radius:var(--radius-lg);max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-    
-    <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:48px;margin-bottom:12px;">🔐</div>
-      <h2 style="color:var(--ink);font-size:20px;font-weight:700;margin-bottom:8px;">Acceso</h2>
-      <p style="color:var(--ink4);font-size:13px;">Selecciona tu tipo de acceso</p>
+
+<!-- ══════════════════════════════════════ LOGIN MODAL ══════════════════════════════════════ -->
+<div id="login-modal" class="login-modal">
+  <div class="login-modal-content">
+    <div class="login-modal-header">
+      <div class="login-modal-icon">🔐</div>
+      <h2>Acceso al Sistema</h2>
+      <p>Selecciona tu tipo de acceso</p>
     </div>
     
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      <div>
-        <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Contraseña Admin</label>
-        <input type="password" id="admin-password" class="f-input" placeholder="Ingresa tu contraseña" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);font-size:14px;">
+    <div class="login-modal-body">
+      <div class="form-group">
+        <label for="admin-password">Contraseña Admin</label>
+        <input type="password" id="admin-password" class="f-input" placeholder="Ingresa tu contraseña">
       </div>
       
-      <button onclick="app.verificarAdmin()" class="topbar-btn primary" style="width:100%;justify-content:center;">
+      <button onclick="app.verificarAdmin()" class="topbar-btn primary btn-full">
         🔑 Entrar como Admin
       </button>
       
-      <button onclick="app.entrarComoCliente()" class="topbar-btn ghost" style="width:100%;justify-content:center;">
-        👤 Entrar como Cliente
+      <button onclick="app.entrarComoCliente()" class="topbar-btn ghost btn-full">
+        👤 Continuar como Cliente
       </button>
     </div>
     
-    <div style="margin-top:20px;padding:12px;background:var(--blue-l);border-radius:8px;border-left:3px solid var(--blue);">
-      <div style="font-size:11px;color:var(--ink4);">
-        💡 <strong>Cliente:</strong> Solo podrás usar el estimador para cotizar tu PWA.<br>
-        🔐 <strong>Admin:</strong> Acceso completo para ver solicitudes y diagnósticos.
-      </div>
+    <div class="login-modal-info">
+      <div><strong>👤 Cliente:</strong> Solo podrás usar el estimador para cotizar tu PWA.</div>
+      <div><strong>🔐 Admin:</strong> Acceso completo para ver solicitudes y diagnósticos.</div>
     </div>
   </div>
 </div>
@@ -59,8 +57,8 @@
 <!-- ══════════════════════════════════════ LAYOUT PRINCIPAL ══════════════════════════════════════ -->
 <div class="layout">
   
-  <!-- Sidebar (SOLO ADMIN) -->
-  <aside class="sidebar" id="sidebar-admin" style="display:none;">
+  <!-- ══════════════════════════════════════ SIDEBAR ADMIN ══════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar-admin">
     <div class="sidebar-logo">
       <div class="logo-icon">🔧</div>
       <div class="logo-text">
@@ -82,24 +80,47 @@
     
     <div class="sidebar-footer">
       <button class="btn-salir" onclick="app.cerrarSesionAdmin()">
-        <span>🗑️</span>
-        <span>Cerrar Sesión Admin</span>
+        <span>🚪</span>
+        <span>Cerrar Sesión</span>
       </button>
     </div>
   </aside>
 
-  <!-- Sidebar (CLIENTE - Limitado) -->
-    <!-- Topbar -->
-    <aside class="sidebar" id="sidebar-cliente" style="display:none;">
-      <div class="sidebar-logo">
-        <div class="logo-icon">🔧</div>
-        <div class="logo-text">
-          <strong>PWA Estimator</strong>
-          <span>Cotizador</span>
-        </div>
+  <!-- ══════════════════════════════════════ SIDEBAR CLIENTE ══════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar-cliente">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🔧</div>
+      <div class="logo-text">
+        <strong>PWA Estimator</strong>
+        <span>Cotizador</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">Herramientas</div>
+    <button class="nav-item active" onclick="app.mostrarPantalla('estimador-screen')">
+      <span class="nav-icon">📊</span>
+      <span>Estimador PWA</span>
+    </button>
+    
+    <div class="sidebar-footer">
+      <button class="btn-salir" onclick="app.mostrarLogin()">
+        <span>🔐</span>
+        <span>Acceso Admin</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════ MAIN CONTENT ══════════════════════════════════════ -->
+  <div class="main">
+    
+    <!-- ══════════════════════════════════════ TOPBAR ══════════════════════════════════════ -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title" id="topbar-title">Estimador PWA</div>
+        <div class="topbar-sub" id="topbar-sub">Cotiza tu proyecto en minutos</div>
       </div>
       <div class="topbar-right">
-        <button class="topbar-btn ghost" onclick="app.toggleTema()" title="Cambiar tema     claro/oscuro" style="min-width:44px;padding:8px;">
+        <button class="topbar-btn ghost" onclick="app.toggleTema()" title="Cambiar tema claro/oscuro">
           🌓
         </button>
         <button class="topbar-btn primary" onclick="app.mostrarPantalla('estimador-screen')">
@@ -108,30 +129,15 @@
         </button>
       </div>
     </div>
-    <div class="sidebar-section">Herramientas</div>
-    <button class="nav-item active" onclick="app.mostrarPantalla('estimador-screen')">
-      <span class="nav-icon">📊</span>
-      <span>Estimador PWA</span>
-    </button>
-    <div class="sidebar-footer">
-      <button class="btn-salir" onclick="app.mostrarLogin()">
-        <span>🔐</span>
-        <span>Acceso Admin</span>
-      </button>
-    </div>
-  </aside>
-    <!-- Content -->
+    <!-- ══════════════════════════════════════ CONTENT ══════════════════════════════════════ -->
     <div class="content">
-      
-      <!-- ══════════════════════════════════════ ESTIMADOR PWA ══════════════════════════════════════ -->
+      <!-- ══════════════════════════════════════ ESTIMADOR SCREEN ══════════════════════════════════════ -->
       <section id="estimador-screen" class="screen active">
-        
         <!-- Header -->
         <div style="margin-bottom:24px;">
           <h1 style="font-size:28px;font-weight:800;color:var(--ink);margin-bottom:8px;">🔧 Estimador PWA Modular</h1>
           <p style="color:var(--ink4);font-size:14px;">Configura las características de tu proyecto y obtén un estimado de inversión al instante.</p>
         </div>
-
         <!-- Progreso -->
         <div style="display:flex;gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:8px;">
           <div class="step active" data-paso="1" style="padding:8px 16px;background:var(--blue);color:white;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">1. Disciplinas</div>
@@ -139,17 +145,13 @@
           <div class="step" data-paso="3" style="padding:8px 16px;background:var(--bg2);color:var(--ink3);border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">3. Capacidades</div>
           <div class="step" data-paso="4" style="padding:8px 16px;background:var(--bg2);color:var(--ink3);border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;">4. Datos</div>
         </div>
-
         <div class="card">
-          <div class="card-body">
-            
+          <div class="card-body">  
             <!-- PASO 1: DISCIPLINAS -->
             <div id="paso-1">
               <h3 style="margin-bottom:20px;">⚙️ 1. Disciplinas de Ingeniería</h3>
               <p style="color:var(--ink4);font-size:13px;margin-bottom:16px;">Seleccione las disciplinas requeridas para su proyecto:</p>
-              
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
-                
                 <label class="disciplina-card">
                   <input type="checkbox" name="disciplina" value="electrica" hidden>
                   <div class="disciplina-card-content">
@@ -159,7 +161,6 @@
                     <span class="puntos-badge">+15 pts</span>
                   </div>
                 </label>
-            
                 <label class="disciplina-card">
                   <input type="checkbox" name="disciplina" value="mecanica" hidden>
                   <div class="disciplina-card-content">
@@ -169,7 +170,6 @@
                     <span class="puntos-badge">+15 pts</span>
                   </div>
                 </label>
-            
                 <label class="disciplina-card">
                   <input type="checkbox" name="disciplina" value="civil" hidden>
                   <div class="disciplina-card-content">
@@ -179,7 +179,6 @@
                     <span class="puntos-badge">+15 pts</span>
                   </div>
                 </label>
-            
                 <label class="disciplina-card">
                   <input type="checkbox" name="disciplina" value="seguridad" hidden>
                   <div class="disciplina-card-content">
@@ -189,18 +188,13 @@
                     <span class="puntos-badge">+12 pts</span>
                   </div>
                 </label>
-            
               </div>
-              
               <div id="badge-multidisciplinario" style="display:none;margin-top:16px;padding:10px 16px;background:var(--amber-l);border:1px solid var(--amber);border-radius:8px;color:var(--amber);font-size:12px;font-weight:600;"></div>
-              
               <button onclick="estimatorUI.siguientePaso(2)" class="topbar-btn primary" style="margin-top:24px;">Continuar →</button>
             </div>
-
             <!-- PASO 2: MOTOR DE COTIZACIÓN -->
             <div id="paso-2" style="display:none;">
               <h3 style="margin-bottom:20px;">💰 2. Motor de Cotización Universal</h3>
-              
               <div style="background:var(--blue-l);padding:20px;border-radius:12px;border:1px dashed var(--blue-m);margin-bottom:20px;">
                 <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
                   <input type="checkbox" id="motor-cotizacion-toggle" style="width:20px;height:20px;">
@@ -210,7 +204,6 @@
                   </div>
                 </label>
               </div>
-              
               <div id="motor-componentes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px;">
                 <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:8px;cursor:pointer;">
                   <input type="checkbox" name="componente" value="materiales" style="width:16px;height:16px;">
@@ -233,24 +226,20 @@
                   <span style="font-size:13px;color:var(--ink3);">🚚 Viáticos</span>
                 </label>
               </div>
-              
               <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border-radius:12px;">
                 <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
                   <input type="checkbox" id="neodata-sync" style="width:18px;height:18px;">
                   <span style="font-size:13px;color:var(--ink);">Exportación a Neodata / Excel (+15 pts)</span>
                 </label>
-              </div>
-              
+              </div>  
               <div style="display:flex;gap:10px;margin-top:24px;">
                 <button onclick="estimatorUI.anteriorPaso(1)" class="topbar-btn ghost">← Atrás</button>
                 <button onclick="estimatorUI.siguientePaso(3)" class="topbar-btn primary">Continuar →</button>
               </div>
             </div>
-
             <!-- PASO 3: CAPACIDADES -->
             <div id="paso-3" style="display:none;">
               <h3 style="margin-bottom:20px;">🚀 3. Capacidades Avanzadas</h3>
-              
               <div style="display:grid;gap:12px;">
                 <label style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
                   <input type="checkbox" name="capacidad" value="offline" style="width:18px;height:18px;">
@@ -258,8 +247,7 @@
                     <strong style="color:var(--ink);font-size:13px;">Modo Offline Completo</strong>
                     <div style="font-size:11px;color:var(--ink4);">Trabajar sin conexión, sincronización automática (+30 pts)</div>
                   </div>
-                </label>
-                
+                </label>       
                 <label style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
                   <input type="checkbox" name="capacidad" value="cloudSync" style="width:18px;height:18px;">
                   <div>
@@ -267,7 +255,6 @@
                     <div style="font-size:11px;color:var(--ink4);">Backup automático, multi-dispositivo (+25 pts)</div>
                   </div>
                 </label>
-                
                 <label style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;cursor:pointer;">
                   <input type="checkbox" name="capacidad" value="erp" style="width:18px;height:18px;">
                   <div>
@@ -276,17 +263,14 @@
                   </div>
                 </label>
               </div>
-              
               <div style="display:flex;gap:10px;margin-top:24px;">
                 <button onclick="estimatorUI.anteriorPaso(2)" class="topbar-btn ghost">← Atrás</button>
                 <button onclick="estimatorUI.siguientePaso(4)" class="topbar-btn primary">Continuar →</button>
               </div>
             </div>
-
             <!-- PASO 4: DATOS DE CONTACTO -->
             <div id="paso-4" style="display:none;">
-              <h3 style="margin-bottom:20px;">📋 4. Datos de Contacto</h3>
-              
+              <h3 style="margin-bottom:20px;">📋 4. Datos de Contacto</h3>            
               <div style="display:grid;gap:16px;max-width:500px;">
                 <div>
                   <label style="display:block;font-size:12px;color:var(--ink3);margin-bottom:6px;">Empresa</label>
@@ -312,7 +296,6 @@
                   </select>
                 </div>
               </div>
-              
               <div style="margin-top:24px;padding:16px;background:var(--bg2);border-radius:12px;">
                 <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                   <span style="color:var(--ink3);font-size:13px;">Puntos estimados:</span>
@@ -323,30 +306,24 @@
                   <span id="nivel-resumen" style="color:var(--green);font-weight:700;">Starter</span>
                 </div>
               </div>
-              
               <div style="display:flex;gap:10px;margin-top:24px;">
                 <button onclick="estimatorUI.anteriorPaso(3)" class="topbar-btn ghost">← Atrás</button>
                 <button onclick="estimatorUI.finalizarDiagnostico()" class="topbar-btn primary">✅ Finalizar Diagnóstico</button>
               </div>
             </div>
-
             <!-- PASO RESULTADO -->
             <div id="paso-resultado" style="display:none;">
               <div style="text-align:center;padding:20px;background:var(--green-l);border-radius:var(--radius);border:1px solid var(--green);margin-bottom:24px;">
                 <div style="font-size:48px;margin-bottom:8px;">✅</div>
                 <h3 style="color:var(--green);margin:0;">Diagnóstico Completado</h3>
               </div>
-              
               <div id="diagnostico-contenido" style="background:var(--bg);padding:20px;border-radius:var(--radius);margin-bottom:24px;"></div>
-              
               <div id="mensaje-cierre" style="background:var(--blue-l);padding:16px;border-radius:12px;border:1px solid var(--blue-m);color:var(--blue);font-size:13px;margin-bottom:24px;"></div>
-              
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <button onclick="estimatorUI.descargarPDF()" class="topbar-btn ghost">📄 Descargar PDF</button>
                 <button onclick="estimatorUI.solicitarDemo()" class="topbar-btn primary">📅 Solicitar Demo</button>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -430,6 +407,7 @@
 <script src="estimator-ui.js"></script>
 <script src="admin-diagnosticos.js"></script>
 <script src="app.js"></script>
+
 <!-- Notificación Toast -->
 <div id="toast" style="display:none;position:fixed;bottom:20px;right:20px;background:var(--green);color:white;padding:16px 24px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:9999;font-size:13px;font-weight:600;animation:slideIn 0.3s ease;"></div>
 
