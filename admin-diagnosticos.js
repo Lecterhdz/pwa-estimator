@@ -166,43 +166,34 @@ window.adminDiagnosticos = {
     }
   },
   // ─────────────────────────────────────────────────────────────
-  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO)
+  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO - SIN UNDEFINED)
   // ─────────────────────────────────────────────────────────────
   cambiarStatus: async function(id) {
     try {
-      console.log('🔍 Cambiar status - ID buscado:', id);
+      console.log('🔍 Cambiar status - ID:', id);
       
-      // Buscar en el cache PRIMERO (más rápido y confiable)
-      let diagnostico = this.diagnosticosCache?.find(d => {
-        const docId = d.id || d._id || d.documentId;
-        return docId === id;
-      });
+      // Buscar en cache primero
+      let diagnostico = this.diagnosticosCache?.find(d => (d.id || d._id) === id);
       
-      console.log('🔍 Encontrado en cache:', !!diagnostico);
-      
-      // Si no está en cache, buscar en DB directamente
+      // Si no está en cache, buscar en DB
       if (!diagnostico && window.db?.diagnosticos?.get) {
-        console.log('🔍 Buscando en DB...');
         diagnostico = await window.db.diagnosticos.get(id);
-        console.log('🔍 Resultado de DB get():', diagnostico ? 'Encontrado' : 'No encontrado');
       }
       
       if (!diagnostico) {
-        console.error('❌ Diagnóstico no encontrado. ID:', id);
-        console.error('🔍 Cache disponible:', this.diagnosticosCache?.map(d => d.id));
-        alert('❌ Diagnóstico no encontrado\n\nID: ' + id + '\n\nIntenta recargar la página.');
+        alert('❌ Diagnóstico no encontrado\n\nID: ' + id);
         return;
       }
       
       const statusActual = diagnostico.status || 'pendiente';
       
-      // Mostrar menú de status (incluye RECHAZADA)
-      const opciones = `1️⃣ Pendiente\n2️⃣ Contactado\n3️⃣ ✅ Aceptada\n4️⃣ 🔄 En Proceso\n5️⃣ 🎉 Entregada\n6️⃣ ❌ Rechazada`;
-      
+      // Mostrar menú de status
       const nuevoStatus = prompt(
         `Cambiar estado del proyecto:\n\n` +
         `Estado actual: ${statusActual.toUpperCase()}\n\n` +
-        `Escribe el número del nuevo estado:\n${opciones}`,
+        `Escribe el número:\n` +
+        `1️⃣ Pendiente\n2️⃣ Contactado\n3️⃣ ✅ Aceptada\n` +
+        `4️⃣ 🔄 En Proceso\n5️⃣ 🎉 Entregada\n6️⃣ ❌ Rechazada`,
         this.getStatusNumber(statusActual)
       );
       
@@ -214,13 +205,15 @@ window.adminDiagnosticos = {
         '3': 'aceptada',
         '4': 'en_proceso',
         '5': 'entregada',
-        '6': 'rechazada'  // ← NUEVO
+        '6': 'rechazada'
       };
       
       const statusFinal = statusMap[nuevoStatus] || statusActual;
       
-      // Si es "En Proceso", pedir fecha de entrega
-      let fechaEntrega = diagnostico.fechaEntrega;
+      // ⚠️ CORRECCIÓN: Inicializar fechaEntrega como null (no undefined)
+      let fechaEntrega = null;
+      
+      // Solo pedir fecha si es "En Proceso"
       if (statusFinal === 'en_proceso') {
         const semanas = diagnostico.resultado?.semanas || '8';
         const fechaSugerida = this.calcularFechaEntrega(semanas);
@@ -228,35 +221,34 @@ window.adminDiagnosticos = {
           `Fecha estimada de entrega:\n\nFormato: YYYY-MM-DD\nSugerida: ${fechaSugerida}`,
           fechaSugerida
         );
-        if (fechaInput) fechaEntrega = fechaInput;
+        // ⚠️ Si el usuario cancela o deja vacío, usar null (no undefined)
+        fechaEntrega = fechaInput || null;
       }
       
       // Si es "Entregada", mostrar checklist
       if (statusFinal === 'entregada') {
         const checklist = confirm(
           `✅ Checklist de Entrega:\n\n` +
-          `□ Código fuente entregado\n` +
-          `□ Documentación completa\n` +
-          `□ PWA instalable funcionando\n` +
-          `□ Credenciales entregadas\n` +
-          `□ Pago final recibido\n\n` +
-          `¿Confirmas que todo está completado?`
+          `□ Código fuente\n□ Documentación\n□ PWA funcionando\n` +
+          `□ Credenciales\n□ Pago final\n\n¿Todo completado?`
         );
         if (!checklist) return;
       }
       
-      // Actualizar documento
+      // ⚠️ CORRECCIÓN: Solo agregar fechaEntrega si tiene valor válido
       diagnostico.status = statusFinal;
-      diagnostico.fechaEntrega = fechaEntrega;
+      if (fechaEntrega) {
+        diagnostico.fechaEntrega = fechaEntrega;
+      }
       diagnostico.fechaStatusChange = new Date().toISOString();
       
-      // Guardar en DB (add() actualiza si ya existe el ID en Firebase)
+      // Guardar en DB
       await window.db.diagnosticos.add(diagnostico);
       
       console.log('✅ Status actualizado:', statusFinal);
       alert(`✅ Estado actualizado a: ${this.getStatusLabel(statusFinal)}`);
       
-      // Actualizar cache local
+      // Actualizar cache
       const index = this.diagnosticosCache?.findIndex(d => (d.id || d._id) === id);
       if (index !== -1 && this.diagnosticosCache) {
         this.diagnosticosCache[index] = diagnostico;
