@@ -667,13 +667,8 @@ body.tema-claro .topbar-btn.ghost {
   75% { transform: translateX(10px); }
 }
 /* ══════════════════════════════════════ CUANDO NO HAY SIDEBAR VISIBLE ══════════════════════════════════════ */
-.layout:has(.sidebar.visible) {
-  grid-template-columns: 240px 1fr !important;
-}
-
-.layout:not(:has(.sidebar.visible)) {
-  grid-template-columns: 1fr !important;
-}
+.layout:has(.sidebar.visible) { grid-template-columns: 240px 1fr !important; }
+.layout:not(:has(.sidebar.visible)) { grid-template-columns: 1fr !important; }
 /* ══════════════════════════════════════ ESTIMADOR SCREEN ══════════════════════════════════════ */
 .estimador-header {
   margin-bottom: 24px;
@@ -1267,47 +1262,7 @@ body.tema-claro .topbar-btn.ghost {
   background: #15803d;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .estimador-progress {
-    gap: 4px;
-  }
-  
-  .step {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-  
-  .disciplinas-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .componentes-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .estimador-buttons {
-    flex-direction: column;
-  }
-  
-  .estimador-buttons .topbar-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .resultado-buttons {
-    grid-template-columns: 1fr;
-  }
-  
-  .admin-filtros {
-    flex-direction: column;
-  }
-  
-  .admin-filtros .f-select,
-  .admin-filtros .f-date {
-    width: 100%;
-  }
-}
+
 /* ══════════════════════════════════════ TIPOS DE PWA GRID ══════════════════════════════════════ */
 .tipos-pwa-grid {
   display: grid;
@@ -1596,41 +1551,6 @@ body.tema-claro .topbar-btn.ghost {
   font-size: 14px;
 }
 
-/* ══════════════════════════════════════ RESPONSIVE ══════════════════════════════════════ */
-@media (max-width: 768px) {
-  .tipos-pwa-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .bases-list {
-    gap: 10px;
-  }
-  
-  .base-card {
-    padding: 14px;
-  }
-  
-  .modulos-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .escala-options {
-    grid-template-columns: 1fr;
-  }
-  
-  .estimador-buttons {
-    flex-direction: column;
-  }
-  
-  .estimador-buttons .topbar-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .resultado-buttons {
-    grid-template-columns: 1fr;
-  }
-}
 /* ══════════════════════════════════════ STATUS BADGES ══════════════════════════════════════ */
 .badge-status {
   padding: 4px 10px;
@@ -1746,354 +1666,6 @@ body.tema-claro .topbar-btn.ghost {
   background: var(--bg2);
   color: var(--ink4);
 }
-/* ══════════════════════════════════════ TABLET (768px - 1024px) ══════════════════════════════════════ */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .layout { 
-    grid-template-columns: 200px 1fr !important; 
-  }
-  
-  .sidebar {
-    width: 200px !important;
-  }
-  
-  .content {
-    padding: 24px 24px !important;
-  }
-}
-
-/* ══════════════════════════════════════ MÓVIL (max 768px) ══════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* Layout sin sidebar - solo contenido principal */
-  .layout { 
-    grid-template-columns: 1fr !important;
-    grid-template-areas: "main" !important;
-  }
-  
-  /* Sidebar oculto por defecto en móvil */
-  .sidebar {
-    display: none !important;
-    position: fixed !important;
-    left: -280px !important;
-    top: 0 !important;
-    width: 260px !important;
-    height: 100vh !important;
-    z-index: 200 !important;
-    box-shadow: 4px 0 30px rgba(0,0,0,0.4) !important;
-    transition: left 0.3s ease !important;
-  }
-  
-  .sidebar.visible {
-    display: flex !important;
-    left: 0 !important;
-  }
-  
-  /* Overlay para cuando el sidebar está abierto */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
-    z-index: 150;
-  }
-  
-  .sidebar-overlay.active {
-    display: block !important;
-  }
-  
-  /* Main ocupa toda la pantalla */
-  .main { 
-    width: 100% !important;
-    margin-left: 0 !important;
-  }
-  
-  /* Content ocupa todo el ancho disponible */
-  .content { 
-    padding: 16px 16px 100px !important; /* Padding extra abajo para bottom nav si existe */
-    width: 100% !important;
-    min-height: calc(100vh - 54px) !important;
-  }
-  
-  /* Topbar compacta */
-  .topbar {
-    padding: 0 16px !important;
-    height: 54px !important;
-  }
-  
-  .topbar-title {
-    font-size: 14px !important;
-    font-weight: 700 !important;
-  }
-  
-  .topbar-sub {
-    display: none !important;
-  }
-  
-  .topbar-right {
-    gap: 8px !important;
-  }
-  
-  .topbar-right .topbar-btn {
-    min-width: 40px !important;
-    padding: 8px !important;
-  }
-  
-  /* Ocultar texto de botones en topbar, solo íconos */
-  .topbar-right .topbar-btn span:not(.nav-icon) {
-    display: none !important;
-  }
-  
-  /* Títulos más pequeños */
-  .estimador-header h1,
-  .admin-header h1 {
-    font-size: 22px !important;
-  }
-  
-  .estimador-header p,
-  .admin-header p {
-    font-size: 13px !important;
-  }
-  
-  /* Cards en 1 columna */
-  .tipos-pwa-grid,
-  .disciplinas-grid,
-  .componentes-grid,
-  .modulos-grid,
-  .escala-options {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-  
-  /* Botones en columna */
-  .estimador-buttons,
-  .resultado-buttons {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-  
-  .estimador-buttons .topbar-btn,
-  .resultado-buttons .topbar-btn {
-    width: 100% !important;
-    justify-content: center !important;
-  }
-  
-  /* Tabla con scroll horizontal */
-  .table-responsive {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    margin: 0 -16px !important; /* Compensar padding del content */
-    padding: 0 16px !important;
-  }
-  
-  .tabla-diagnosticos {
-    min-width: 700px !important;
-    font-size: 12px !important;
-  }
-  
-  .tabla-diagnosticos th,
-  .tabla-diagnosticos td {
-    padding: 10px 8px !important;
-    white-space: nowrap !important;
-  }
-  
-  /* Login modal ajustado */
-  .login-modal-content {
-    width: 95% !important;
-    max-width: 360px !important;
-    padding: 30px 20px !important;
-  }
-  
-  .login-modal-header h2 {
-    font-size: 18px !important;
-  }
-  
-  /* Inputs más grandes para touch */
-  .f-input,
-  .f-select,
-  .topbar-btn {
-    min-height: 48px !important;
-    font-size: 15px !important;
-  }
-  
-  /* Checkboxes y radios más grandes */
-  input[type="checkbox"],
-  input[type="radio"] {
-    width: 20px !important;
-    height: 20px !important;
-    accent-color: var(--blue);
-  }
-  
-  /* Steps de progreso con scroll */
-  .estimador-progress {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding-bottom: 8px !important;
-  }
-  
-  .step {
-    padding: 6px 12px !important;
-    font-size: 11px !important;
-    white-space: nowrap !important;
-  }
-  
-  /* Cards de disciplinas/base más compactas */
-  .tipo-pwa-content,
-  .base-content,
-  .disciplina-card-content {
-    padding: 16px 14px !important;
-  }
-  
-  .tipo-icon,
-  .disciplina-icon {
-    font-size: 2rem !important;
-  }
-  
-  /* Módulos details más pequeños */
-  .modulo-seccion summary {
-    padding: 12px !important;
-    font-size: 13px !important;
-  }
-  
-  .modulos-grid {
-    padding: 12px !important;
-  }
-  
-  /* Resumen más compacto */
-  .estimador-resumen {
-    padding: 16px !important;
-  }
-  
-  .resumen-row {
-    font-size: 12px !important;
-  }
-  
-  .resumen-value.precio {
-    font-size: 14px !important;
-  }
-  
-  /* Bottom Navigation (opcional, si quieres agregar) */
-  .bottom-nav {
-    display: flex !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--white);
-    border-top: 1px solid var(--border);
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    z-index: 150;
-    justify-content: space-around;
-  }
-  
-  .bottom-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    color: var(--ink3);
-    font-size: 10px;
-    cursor: pointer;
-  }
-  
-  .bottom-nav-item.active {
-    color: var(--blue);
-  }
-  
-  .bottom-nav-item .bn-icon {
-    font-size: 20px;
-  }
-}
-
-/* ══════════════════════════════════════ MÓVIL PEQUEÑO (max 480px) ══════════════════════════════════════ */
-@media (max-width: 480px) {
-  .content {
-    padding: 12px 12px 100px !important;
-  }
-  
-  .topbar {
-    padding: 0 12px !important;
-    height: 50px !important;
-  }
-  
-  .topbar-title {
-    font-size: 13px !important;
-  }
-  
-  .estimador-header h1,
-  .admin-header h1 {
-    font-size: 20px !important;
-  }
-  
-  .card {
-    border-radius: 8px !important;
-  }
-  
-  .card-body {
-    padding: 0 12px 12px !important;
-  }
-  
-  .login-modal-content {
-    padding: 24px 16px !important;
-  }
-  
-  .tipo-pwa-content h4,
-  .base-content strong {
-    font-size: 13px !important;
-  }
-  
-  .tipo-pwa-content p,
-  .base-content span {
-    font-size: 11px !important;
-  }
-}
-
-/* ══════════════════════════════════════ SIDEBAR TOGGLE EN MÓVIL ══════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* Botón hamburguesa en topbar (si lo agregas) */
-  .hamburger-btn {
-    display: flex !important;
-    padding: 8px !important;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--ink);
-    font-size: 20px;
-  }
-  
-  /* Animación de entrada del sidebar */
-  @keyframes slideIn {
-    from { left: -280px; }
-    to { left: 0; }
-  }
-  
-  .sidebar.visible {
-    animation: slideIn 0.3s ease !important;
-  }
-}
-
-/* ══════════════════════════════════════ DESKTOP (min 1025px) ══════════════════════════════════════ */
-@media (min-width: 1025px) {
-  .sidebar {
-    display: flex !important; /* Sidebar siempre visible en desktop */
-    position: sticky !important;
-    left: 0 !important;
-  }
-  
-  .sidebar.visible {
-    display: flex !important;
-  }
-  
-  .hamburger-btn {
-    display: none !important;
-  }
-  
-  .bottom-nav {
-    display: none !important;
-  }
-}
 /* ══════════════════════════════════════ HAMBURGER BUTTON ══════════════════════════════════════ */
 .hamburger-btn {
   display: none !important;
@@ -2106,7 +1678,6 @@ body.tema-claro .topbar-btn.ghost {
   min-width: 44px !important;
   min-height: 44px !important;
 }
-
 /* ══════════════════════════════════════ SIDEBAR OVERLAY ══════════════════════════════════════ */
 .sidebar-overlay {
   display: none !important;
@@ -2124,4 +1695,188 @@ body.tema-claro .topbar-btn.ghost {
 }
 .sidebar-overlay.active {
   display: block !important;
+}
+/* ══════════════════════════════════════ RESPONSIVE UNIFICADO ══════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   TABLET (768px - 1024px)
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .layout { 
+    grid-template-columns: 200px 1fr !important; 
+  }
+  .sidebar { width: 200px !important; }
+  .content { padding: 24px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MÓVIL (max 768px) - REGLAS PRINCIPALES
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  
+  /* Layout: sin sidebar, contenido ocupa todo */
+  .layout { 
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "main" !important;
+  }
+  
+  /* Sidebar: oculto por defecto, se muestra con clase .visible */
+  .sidebar {
+    display: none !important;
+    position: fixed !important;
+    left: -280px !important;
+    top: 0 !important;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 200 !important;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.4) !important;
+    transition: left 0.3s ease !important;
+  }
+  
+  .sidebar.visible {
+    display: flex !important;
+    left: 0 !important;
+    animation: slideIn 0.3s ease !important;
+  }
+  
+  /* Overlay para cerrar sidebar al tocar fuera */
+  .sidebar-overlay {
+    display: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0,0,0,0.5) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 150 !important;
+  }
+  .sidebar-overlay.active { display: block !important; }
+  
+  /* Main y Content ocupan 100% */
+  .main { width: 100% !important; margin-left: 0 !important; }
+  .content { 
+    padding: 16px !important; 
+    width: 100% !important; 
+    min-height: calc(100vh - 54px) !important;
+  }
+  
+  /* Topbar compacta */
+  .topbar { padding: 0 16px !important; height: 54px !important; }
+  .topbar-title { font-size: 14px !important; }
+  .topbar-sub { display: none !important; }
+  .topbar-right { gap: 8px !important; }
+  .topbar-right .topbar-btn { min-width: 40px !important; padding: 8px !important; }
+  .topbar-right .topbar-btn span:not(.nav-icon) { display: none !important; }
+  
+  /* Títulos más pequeños */
+  .estimador-header h1, .admin-header h1 { font-size: 22px !important; }
+  .estimador-header p, .admin-header p { font-size: 13px !important; }
+  
+  /* Grids en 1 columna */
+  .tipos-pwa-grid, .disciplinas-grid, .componentes-grid, 
+  .modulos-grid, .escala-options {
+    grid-template-columns: 1fr !important; gap: 12px !important;
+  }
+  
+  /* Botones en columna */
+  .estimador-buttons, .resultado-buttons {
+    flex-direction: column !important; gap: 10px !important;
+  }
+  .estimador-buttons .topbar-btn, .resultado-buttons .topbar-btn {
+    width: 100% !important; justify-content: center !important;
+  }
+  
+  /* Tabla con scroll horizontal */
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin: 0 -16px !important;
+    padding: 0 16px !important;
+  }
+  .tabla-diagnosticos { min-width: 700px !important; font-size: 12px !important; }
+  .tabla-diagnosticos th, .tabla-diagnosticos td {
+    padding: 10px 8px !important; white-space: nowrap !important;
+  }
+  
+  /* Login modal ajustado */
+  .login-modal-content {
+    width: 95% !important; max-width: 360px !important; padding: 30px 20px !important;
+  }
+  .login-modal-header h2 { font-size: 18px !important; }
+  
+  /* Inputs más grandes para touch */
+  .f-input, .f-select, .topbar-btn {
+    min-height: 48px !important; font-size: 15px !important;
+  }
+  input[type="checkbox"], input[type="radio"] {
+    width: 20px !important; height: 20px !important; accent-color: var(--blue);
+  }
+  
+  /* Steps de progreso con scroll */
+  .estimador-progress {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 8px !important;
+  }
+  .step { padding: 6px 12px !important; font-size: 11px !important; white-space: nowrap !important; }
+  
+  /* Cards más compactas */
+  .tipo-pwa-content, .base-content, .disciplina-card-content { padding: 16px 14px !important; }
+  .tipo-icon, .disciplina-icon { font-size: 2rem !important; }
+  
+  /* Módulos details */
+  .modulo-seccion summary { padding: 12px !important; font-size: 13px !important; }
+  .modulos-grid { padding: 12px !important; }
+  
+  /* Resumen */
+  .estimador-resumen { padding: 16px !important; }
+  .resumen-row { font-size: 12px !important; }
+  .resumen-value.precio { font-size: 14px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MÓVIL PEQUEÑO (max 480px)
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .content { padding: 12px !important; }
+  .topbar { padding: 0 12px !important; height: 50px !important; }
+  .topbar-title { font-size: 13px !important; }
+  .estimador-header h1, .admin-header h1 { font-size: 20px !important; }
+  .card { border-radius: 8px !important; }
+  .card-body { padding: 0 12px 12px !important; }
+  .login-modal-content { padding: 24px 16px !important; }
+  .tipo-pwa-content h4, .base-content strong { font-size: 13px !important; }
+  .tipo-pwa-content p, .base-content span { font-size: 11px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DESKTOP (min 1025px) - Sidebar siempre visible
+   ───────────────────────────────────────────────────────────── */
+@media (min-width: 1025px) {
+  .sidebar {
+    position: sticky !important;
+    left: 0 !important;
+  }
+  .hamburger-btn { display: none !important; }
+  .bottom-nav { display: none !important; }
+  .sidebar-overlay { display: none !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ANIMACIONES Y UTILITIES
+   ───────────────────────────────────────────────────────────── */
+@keyframes slideIn {
+  from { left: -280px; }
+  to { left: 0; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Badge de status rechazada */
+.badge-status.rechazada {
+  background: var(--rose-l);
+  color: var(--rose);
+  font-weight: 600;
 }
