@@ -7,13 +7,15 @@ console.log('🎨 estimator-ui.js cargado');
 window.estimatorUI = {
   pasoActual: 1,
   seleccion: {
-    disciplinas: [],
+    tipoPWA: null,      // Radio - 1 selección
+    base: null,         // Radio - 1 selección
+    modulos: [],        // Checkbox - múltiples selecciones
+    escala: null,       // Radio - 1 selección
     motorCotizacion: false,
     componentes: [],
     exportacionNeodata: false,
     exportacionExcel: false,
     capacidades: [],
-    escala: null,
     personalizacion: null
   },
   
@@ -116,6 +118,13 @@ window.estimatorUI = {
     this.seleccion.modulos = Array.from(
       document.querySelectorAll('input[name="modulo"]:checked')
     ).map(cb => cb.value);
+    
+    // Asegurar que siempre sea un array (aunque esté vacío)
+    if (!this.seleccion.modulos) {
+      this.seleccion.modulos = [];
+    }
+    
+    console.log('🔍 Módulos seleccionados:', this.seleccion.modulos);
   },
   
   actualizarSeleccionEscala: function() {
