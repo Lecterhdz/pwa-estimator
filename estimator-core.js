@@ -70,36 +70,29 @@ window.estimadorPWA.calcular = function(seleccion) {
 };
 
 // ─────────────────────────────────────────────────────────────
-// GENERAR MENSAJE DE CIERRE AUTOMÁTICO
+// GENERAR MENSAJE DE CIERRE (CORREGIDO PARA PWAs)
 // ─────────────────────────────────────────────────────────────
 window.estimadorPWA.generarMensajeCierre = function(detalles) {
-  const discNombres = detalles.disciplinas.map(d => d.nombre.split(' ')[0]);
-  const esMultidisciplinario = detalles.bonoMultidisciplinario || detalles.disciplinas.length >= 2;
-  
-  let mensaje = `Configuración Técnica Detectada: `;
-  
-  if (esMultidisciplinario) {
-    mensaje += `Sistema Multidisciplinario (${discNombres.join('/')}) `;
-  } else if (detalles.disciplinas[0]) {
-    mensaje += `Sistema Especializado en ${detalles.disciplinas[0].nombre} `;
+  try {
+    const tipo = detalles.tipoPWA?.nombre || 'PWA';
+    const base = detalles.base?.nombre || 'funcionalidad base';
+    
+    let mensaje = `✅ Configuración detectada: `;
+    mensaje += `PWA para ${tipo} con ${base}. `;
+    
+    if (detalles.modulos && detalles.modulos.length > 0) {
+      mensaje += `Incluye ${detalles.modulos.length} módulos adicionales. `;
+    }
+    
+    mensaje += `Nivel: ${detalles.nivel || 'Custom'}. `;
+    mensaje += `Tiempo estimado: ${detalles.semanas || 'Por definir'}.`;
+    
+    return mensaje;
+    
+  } catch (error) {
+    console.error('❌ Error generando mensaje de cierre:', error);
+    return `✅ Diagnóstico completado. Te contactaremos pronto con tu cotización formal.`;
   }
-  
-  if (detalles.motorCotizacion) {
-    mensaje += `con Motor de Costos Avanzado `;
-  }
-  
-  mensaje += `. Nivel de Complejidad: ${detalles.nivel}. `;
-  mensaje += `Tu PWA está lista para gestionar proyectos de alta escala `;
-  
-  if (detalles.disciplinas.some(d => d.id === 'electrica' || d.id === 'seguridad')) {
-    mensaje += `con cumplimiento de NOM y NFPA`;
-  } else if (detalles.disciplinas.some(d => d.id === 'mecanica')) {
-    mensaje += `con análisis térmico y de flujo`;
-  }
-  
-  mensaje += `.`;
-  
-  return mensaje;
 };
 
 // ─────────────────────────────────────────────────────────────
