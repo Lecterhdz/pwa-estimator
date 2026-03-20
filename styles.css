@@ -91,7 +91,7 @@ input, select, textarea {
   grid-area: sidebar !important;
   background: var(--white);
   border-right: 1px solid var(--border);
-  display: none !important; /* Oculto por defecto */
+  display: flex !important;        /* ← siempre flex, nunca none */
   flex-direction: column;
   padding: 0;
   position: sticky;
@@ -101,11 +101,10 @@ input, select, textarea {
   z-index: 100;
   width: 240px;
   flex-shrink: 0;
+  /* SIN transform aquí — el desktop no necesita animación */
 }
-
-.sidebar.visible {
-  display: flex !important; /* Solo visible con clase .visible */
-}
+/* elimina o comenta .sidebar.visible completamente */
+/*.sidebar.visible { display: flex !important; } */
 
 /* ... (resto de estilos del sidebar iguales) ... */
 .sidebar-logo {
@@ -1558,18 +1557,12 @@ body.tema-claro .topbar-btn.ghost {
 @media (min-width: 1025px) {
   .sidebar {
     position: sticky !important;
-    left: 0 !important;
-    display: flex !important; /* Sidebar visible siempre en desktop */
+    transform: translateX(0) !important; /* ← asegura que esté visible */
+    display: flex !important;
   }
-  .hamburger-btn { 
-    display: none !important; /* Hamburguesa oculta en desktop */
-  }
-  .sidebar-overlay { 
-    display: none !important; 
-  }
-  .bottom-nav { 
-    display: none !important; 
-  }
+  .hamburger-btn { display: none !important; }
+  .sidebar-overlay { display: none !important; }
+  .bottom-nav { display: none !important; }
 }
 /* ══════════════════════════════════════ MÓVIL (max 768px) - ADAPTADO DE SMARTCOT ══════════════════════════════════════ */
 @media (max-width: 768px) {
@@ -1582,18 +1575,19 @@ body.tema-claro .topbar-btn.ghost {
   /* Sidebar: oculto con slide-in (enfoque SmartCot) */
   .sidebar {
     position: fixed !important;
-    left: -260px !important; /* Oculto a la izquierda */
+    left: 0px !important; /* Oculto a la izquierda */
     top: 0 !important;
     bottom: 0 !important;
     width: 260px !important;
     z-index: 260 !important;
-    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Animación suave */
-    box-shadow: none !important;
-    display: flex !important; /* Mantener flex para contenido interno */
+     display: flex !important;
+     transform: translateX(-260px) !important;    /* ← oculto via transform */
+     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+     box-shadow: none !important;
   }
   
   .sidebar.visible {
-    left: 0 !important; /* Se desliza hacia adentro */
+    transform: translateX(0) !important;         /* ← se desliza */
     box-shadow: var(--shadow-lg) !important;
   }
   
