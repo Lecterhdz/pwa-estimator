@@ -202,12 +202,12 @@ input, select, textarea {
   color: var(--blue); 
   font-weight: 600; 
 }
- /* ← agrega esto *
+ 
 .nav-item .nav-icon { 
   font-size: 16px; 
   width: 20px; 
   text-align: center; 
-  flex-shrink: 0; /* ← agrega esto *
+  flex-shrink: 0; 
 }
 
 .nav-badge {
@@ -220,7 +220,7 @@ input, select, textarea {
   border-radius: 20px;
   font-family: var(--mono);
 }
-*/
+
 .sidebar-footer { 
   margin-top: auto; 
   padding: 16px; 
