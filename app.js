@@ -20,18 +20,24 @@ window.app = {
     try {
       console.log('🔧 PWA Estimator iniciando...');
       
-      // Inicializar auth
-      if (window.pwaAuth) {
-        // Sobrescribir callbacks de auth
-        window.pwaAuth.onAuthSuccess = (user) => this.onAuthSuccess(user);
-        window.pwaAuth.onAuthLogout = () => this.onAuthLogout();
-      }
+      // Esperar a que pwaAuth se inicialice
+      await new Promise(resolve => {
+        const checkAuth = () => {
+          if (window.pwaAuth && window.pwaAuth.auth) {
+            // Configurar callbacks
+            window.pwaAuth.onAuthSuccess = (user) => this.onAuthSuccess(user);
+            window.pwaAuth.onAuthLogout = () => this.onAuthLogout();
+            resolve();
+          } else {
+            setTimeout(checkAuth, 100);
+          }
+        };
+        checkAuth();
+      });
       
       this.cargarTemaGuardado();
-      await this.esperarDB();
-      
-      // Verificar sesión (ahora con Firebase Auth)
       this.verificarSesionAuth();
+      await this.esperarDB();
       
       if (this.esAdmin) {
         await this.cargarDiagnosticos();
@@ -155,14 +161,34 @@ window.app = {
   },
 
   // ─────────────────────────────────────────────────────────────
-  // VERIFICAR SESIÓN CON FIREBASE AUTH
+  // VERIFICAR SESIÓN CON FIREBASE AUTH (CORREGIDO)
   // ─────────────────────────────────────────────────────────────
   verificarSesionAuth: function() {
-    const user = window.pwaAuth?.usuarioActual();
-    if (user) {
-      this.esAdmin = true;
-      this.usuarioActual = user;
-      this.onAuthSuccess(user);
+    try {
+      // Verificar que pwaAuth esté disponible
+      if (!window.pwaAuth) {
+        console.warn('⚠️ pwaAuth no disponible, usando modo sin auth');
+        this.esAdmin = false;
+        return false;
+      }
+      
+      // Obtener usuario actual
+      const user = window.pwaAuth.usuarioActual();
+      
+      if (user) {
+        this.esAdmin = true;
+        this.usuarioActual = user;
+        console.log('✅ Sesión auth válida:', user.email);
+        return true;
+      }
+      
+      this.esAdmin = false;
+      return false;
+      
+    } catch (error) {
+      console.error('❌ Error verificando sesión auth:', error);
+      this.esAdmin = false;
+      return false;
     }
   },
   
