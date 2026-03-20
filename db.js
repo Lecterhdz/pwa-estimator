@@ -1,10 +1,22 @@
 // ═══════════════════════════════════════════════════════════════
-// PWA ESTIMATOR - BASE DE DATOS (Firebase + IndexedDB) - CORREGIDO
+// PWA ESTIMATOR - BASE DE DATOS (Firebase + IndexedDB) - ACTUALIZADO
 // ═══════════════════════════════════════════════════════════════
 
 console.log('💾 db.js cargado');
 
 window.db = null;
+
+// ─────────────────────────────────────────────────────────────
+// UTILIDAD: LIMPIAR UNDEFINED DE UN OBJETO
+// ─────────────────────────────────────────────────────────────
+function limpiarUndefined(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  return JSON.parse(JSON.stringify(obj, (key, value) => {
+    // Convertir undefined a null (Firebase acepta null, no undefined)
+    return value === undefined ? null : value;
+  }));
+}
 
 // ─────────────────────────────────────────────────────────────
 // INICIALIZAR FIREBASE + INDEXEDDB
@@ -25,55 +37,116 @@ async function inicializarDB() {
     // Crear objeto db con métodos para diagnosticos
     window.db = {
       diagnosticos: {
-        // ✅ CORREGIDO: Si el doc tiene id, usa SET (update), si no, usa ADD (create)
+        // ✅ CORREGIDO: Limpia undefined + usa SET para update, ADD para create
         add: async (doc) => {
           try {
-            if (doc.id) {
-              // ✅ ACTUALIZAR documento existente
-              await db.collection('diagnosticos').doc(doc.id).set(doc, { merge: true });
-              return doc.id;
+            // Limpiar undefined antes de enviar a Firebase
+            const docLimpio = limpiarUndefined(doc);
+            
+            if (docLimpio.id) {
+              // ✅ ACTUALIZAR documento existente (usar set con merge)
+              await db.collection('diagnosticos').doc(docLimpio.id).set(docLimpio, { merge: true });
+              console.log('✅ Diagnóstico actualizado:', docLimpio.id);
+              return docLimpio.id;
             } else {
-              // ✅ CREAR nuevo documento
-              const newDoc = await db.collection('diagnosticos').add(doc);
+              // ✅ CREAR nuevo documento (Firebase genera ID automático)
+              const newDoc = await db.collection('diagnosticos').add(docLimpio);
+              console.log('✅ Diagnóstico creado:', newDoc.id);
               return newDoc.id;
             }
           } catch (error) {
-            console.error('❌ Error en add():', error);
+            console.error('❌ Error en add():', error.code, error.message);
+            throw error;
+          }
+        },
+        
+        // ✅ CORREGIDO: Eliminar campo específico si es necesario
+        update: async (id, campos) => {
+          try {
+            const camposLimpios = limpiarUndefined(campos);
+            await db.collection('diagnosticos').doc(id).update(camposLimpios);
+            console.log('✅ Diagnóstico actualizado (partial):', id);
+            return id;
+          } catch (error) {
+            console.error('❌ Error en update():', error);
+            throw error;
+          }
+        },
+        
+        // ✅ CORREGIDO: Eliminar campo específico del documento
+        eliminarCampo: async (id, campo) => {
+          try {
+            await db.collection('diagnosticos').doc(id).update({
+              [campo]: firebase.firestore.FieldValue.delete()
+            });
+            console.log('✅ Campo eliminado:', campo, 'de', id);
+            return id;
+          } catch (error) {
+            console.error('❌ Error eliminando campo:', error);
             throw error;
           }
         },
         
         count: async () => {
-          const snapshot = await db.collection('diagnosticos').get();
-          return snapshot.size;
+          try {
+            const snapshot = await db.collection('diagnosticos').get();
+            return snapshot.size;
+          } catch (error) {
+            console.error('❌ Error en count():', error);
+            return 0;
+          }
         },
         
         get: async (id) => {
-          const doc = await db.collection('diagnosticos').doc(id).get();
-          return doc.exists ? { id: doc.id, ...doc.data() } : null;
+          try {
+            const doc = await db.collection('diagnosticos').doc(id).get();
+            return doc.exists ? { id: doc.id, ...doc.data() } : null;
+          } catch (error) {
+            console.error('❌ Error en get():', error);
+            return null;
+          }
         },
         
         toArray: async () => {
-          const snapshot = await db.collection('diagnosticos').orderBy('timestamp', 'desc').limit(100).get();
-          return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          try {
+            const snapshot = await db.collection('diagnosticos')
+              .orderBy('timestamp', 'desc')
+              .limit(100)
+              .get();
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          } catch (error) {
+            console.error('❌ Error en toArray():', error);
+            return [];
+          }
         },
         
         clear: async () => {
-          const snapshot = await db.collection('diagnosticos').get();
-          const batch = db.batch();
-          snapshot.docs.forEach(doc => batch.delete(doc.ref));
-          await batch.commit();
+          try {
+            const snapshot = await db.collection('diagnosticos').get();
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            console.log('✅ Todos los diagnósticos eliminados');
+          } catch (error) {
+            console.error('❌ Error en clear():', error);
+            throw error;
+          }
         },
         
         orderBy: function(field, direction) {
           return {
             limit: (count) => ({
               toArray: async () => {
-                const query = db.collection('diagnosticos')
-                  .orderBy(field, direction)
-                  .limit(count);
-                const snapshot = await query.get();
-                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                try {
+                  const query = db.collection('diagnosticos')
+                    .orderBy(field, direction)
+                    .limit(count);
+                  const snapshot = await query.get();
+                  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } catch (error) {
+                  console.error('❌ Error en orderBy().toArray():', error);
+                  return [];
+                }
               }
             })
           };
@@ -131,14 +204,85 @@ async function inicializarIndexedDB() {
 // ─────────────────────────────────────────────────────────────
 function createDiagnosticosStore(db) {
   return {
-    // ✅ CORREGIDO: Si el doc tiene id, usa put() (update), si no, usa add() (create)
+    // ✅ CORREGIDO: Limpia undefined + usa put() para update, add() para create
     add: async (doc) => {
       return new Promise((resolve, reject) => {
-        const tx = db.transaction('diagnosticos', 'readwrite');
-        const store = tx.objectStore('diagnosticos');
-        const request = doc.id ? store.put(doc) : store.add(doc);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        try {
+          // Limpiar undefined para IndexedDB también
+          const docLimpio = limpiarUndefined(doc);
+          
+          const tx = db.transaction('diagnosticos', 'readwrite');
+          const store = tx.objectStore('diagnosticos');
+          
+          // Si tiene id, usar put() (update), si no, add() (create)
+          const request = docLimpio.id ? store.put(docLimpio) : store.add(docLimpio);
+          
+          request.onsuccess = () => {
+            console.log('✅ IndexedDB:', docLimpio.id ? 'actualizado' : 'creado', request.result);
+            resolve(request.result);
+          };
+          request.onerror = () => {
+            console.error('❌ Error en IndexedDB add/put:', request.error);
+            reject(request.error);
+          };
+        } catch (error) {
+          console.error('❌ Error procesando documento:', error);
+          reject(error);
+        }
+      });
+    },
+    
+    // ✅ NUEVO: Actualizar campos específicos en IndexedDB
+    update: async (id, campos) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          // Primero obtener el documento existente
+          const existente = await this.get(id);
+          if (!existente) {
+            reject(new Error('Documento no encontrado: ' + id));
+            return;
+          }
+          
+          // Fusionar campos
+          const actualizado = { ...existente, ...limpiarUndefined(campos), id };
+          
+          const tx = db.transaction('diagnosticos', 'readwrite');
+          const store = tx.objectStore('diagnosticos');
+          const request = store.put(actualizado);
+          
+          request.onsuccess = () => resolve(id);
+          request.onerror = () => reject(request.error);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    
+    // ✅ NUEVO: Eliminar campo específico en IndexedDB
+    eliminarCampo: async (id, campo) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const existente = await this.get(id);
+          if (!existente) {
+            reject(new Error('Documento no encontrado: ' + id));
+            return;
+          }
+          
+          // Eliminar el campo
+          delete existente[campo];
+          
+          const tx = db.transaction('diagnosticos', 'readwrite');
+          const store = tx.objectStore('diagnosticos');
+          const request = store.put(existente);
+          
+          request.onsuccess = () => {
+            console.log('✅ Campo eliminado:', campo, 'de', id);
+            resolve(id);
+          };
+          request.onerror = () => reject(request.error);
+        } catch (error) {
+          reject(error);
+        }
       });
     },
     
@@ -180,7 +324,10 @@ function createDiagnosticosStore(db) {
         const tx = db.transaction('diagnosticos', 'readwrite');
         const store = tx.objectStore('diagnosticos');
         const request = store.clear();
-        request.onsuccess = () => resolve();
+        request.onsuccess = () => {
+          console.log('✅ IndexedDB: todos los diagnósticos eliminados');
+          resolve();
+        };
         request.onerror = () => reject(request.error);
       });
     },
