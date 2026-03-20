@@ -228,27 +228,47 @@ input, select, textarea {
 }
 */
 .btn-salir {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 9px;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all 0.18s;
-  font-family: var(--font);
+  /* ✅ Reset de estilos nativos */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  
+  /* ✅ Layout */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  padding: 9px !important;
+  
+  /* ✅ Estilo visual */
+  background: var(--white) !important; /* ← Forzar color de fondo */
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  
+  /* ✅ Texto */
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--ink3) !important;
+  font-family: var(--font) !important;
+  text-align: center !important;
+  
+  /* ✅ Interacción */
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  
+  /* ✅ Sin outline por defecto */
+  outline: none !important;
 }
 
-.btn-salir:hover { 
-  background: var(--rose-l); 
-  border-color: #fda4af; 
-  color: var(--rose); 
+.btn-salir:hover {
+  background: var(--rose-l) !important;
+  border-color: #fda4af !important;
+  color: var(--rose) !important;
+}
+
+.btn-salir:active {
+  transform: scale(0.98) !important;
 }
 
 /* ══════════════════════════════════════ MAIN ══════════════════════════════════════ */
