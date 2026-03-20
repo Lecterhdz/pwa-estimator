@@ -104,7 +104,7 @@ renderTabla: function(diagnosticos) {
 },
   
   // ─────────────────────────────────────────────────────────────
-  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO - ACTUALIZA, NO CREA)
+  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO - SIN UNDEFINED)
   // ─────────────────────────────────────────────────────────────
   cambiarStatus: async function(id) {
     try {
@@ -148,8 +148,10 @@ renderTabla: function(diagnosticos) {
       
       const statusFinal = statusMap[nuevoStatus] || statusActual;
       
-      // Si es "En Proceso", pedir fecha de entrega
-      let fechaEntrega = diagnostico.fechaEntrega;
+      // ⚠️ CORRECCIÓN CLAVE: Inicializar como null, NO undefined
+      let fechaEntrega = null;
+      
+      // Solo pedir fecha si es "En Proceso"
       if (statusFinal === 'en_proceso') {
         const semanas = diagnostico.resultado?.semanas || '8';
         const fechaSugerida = this.calcularFechaEntrega(semanas);
@@ -157,7 +159,8 @@ renderTabla: function(diagnosticos) {
           `Fecha estimada de entrega:\n\nFormato: YYYY-MM-DD\nSugerida: ${fechaSugerida}`,
           fechaSugerida
         );
-        if (fechaInput) fechaEntrega = fechaInput;
+        // Si el usuario cancela o deja vacío, mantener null (no undefined)
+        fechaEntrega = fechaInput?.trim() || null;
       }
       
       // Si es "Entregada", mostrar checklist
@@ -174,13 +177,19 @@ renderTabla: function(diagnosticos) {
         if (!checklist) return;
       }
       
-      // ✅ ACTUALIZAR campos del documento EXISTENTE
+      // ⚠️ CORRECCIÓN: Solo agregar fechaEntrega si tiene valor válido
       diagnostico.status = statusFinal;
-      diagnostico.fechaEntrega = fechaEntrega;
-      diagnostico.fechaStatusChange = new Date().toISOString();
       
-      // ✅ CORRECCIÓN CLAVE: Incluir el ID para que UPDATE en lugar de CREATE
-      diagnostico.id = id; // ← ESTO EVITA QUE SE CREE UNO NUEVO
+      // ✅ Solo asignar fechaEntrega si NO es null/undefined/vacío
+      if (fechaEntrega && fechaEntrega.trim()) {
+        diagnostico.fechaEntrega = fechaEntrega.trim();
+      } else {
+        // Si no hay fecha, eliminar el campo para evitar undefined
+        delete diagnostico.fechaEntrega;
+      }
+      
+      diagnostico.fechaStatusChange = new Date().toISOString();
+      diagnostico.id = id; // ← Mantener ID para UPDATE
       
       // Guardar en DB
       await window.db.diagnosticos.add(diagnostico);
