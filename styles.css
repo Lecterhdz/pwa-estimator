@@ -91,7 +91,7 @@ input, select, textarea {
   grid-area: sidebar !important;
   background: var(--white);
   border-right: 1px solid var(--border);
-  display: flex !important;        /* ← siempre flex, nunca none */
+  display: flex !important;        /* SIEMPRE flex — nunca none */
   flex-direction: column;
   padding: 0;
   position: sticky;
@@ -101,10 +101,13 @@ input, select, textarea {
   z-index: 100;
   width: 240px;
   flex-shrink: 0;
-  /* SIN transform aquí — el desktop no necesita animación */
+  /* Sin transform aquí — desktop no necesita animación */
 }
-/* elimina o comenta .sidebar.visible completamente */
-/*.sidebar.visible { display: flex !important; } */
+
+/* En desktop .visible no hace nada especial, ya está visible */
+.sidebar.visible {
+  display: flex !important;
+}
 
 /* ... (resto de estilos del sidebar iguales) ... */
 .sidebar-logo {
@@ -1555,35 +1558,51 @@ body.tema-claro .topbar-btn.ghost {
 /* ══════════════════════════════════════ RESPONSIVE UNIFICADO ══════════════════════════════════════ */
 /* ══════════════════════════════════════ DESKTOP (min 1025px) ══════════════════════════════════════ */
 @media (min-width: 1025px) {
-  .sidebar {
-    position: sticky !important;
-    transform: translateX(0) !important; /* ← asegura que esté visible */
-    display: flex !important;
+  .layout {
+    grid-template-columns: 240px 1fr !important;
   }
-  .hamburger-btn { display: none !important; }
-  .sidebar-overlay { display: none !important; }
-  .bottom-nav { display: none !important; }
+  .sidebar {
+    display: flex !important;
+    position: sticky !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+  .hamburger-btn {
+    display: none !important;
+  }
+  .sidebar-overlay {
+    display: none !important;
+  }
+  .bottom-nav {
+    display: none !important;
+  }
 }
 /* ══════════════════════════════════════ MÓVIL (max 768px) - ADAPTADO DE SMARTCOT ══════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Layout: contenido ocupa todo */
-  .layout { 
+  .layout {
     grid-template-columns: 1fr !important;
     grid-template-areas: "main" !important;
   }
-  
-  /* Sidebar: oculto con slide-in (enfoque SmartCot) */
+
+  /* Sidebar: off-screen por transform, NUNCA display:none */
   .sidebar {
     position: fixed !important;
-    left: 0px !important; /* Oculto a la izquierda */
     top: 0 !important;
+    left: 0 !important;
     bottom: 0 !important;
     width: 260px !important;
+    height: 100vh !important;
     z-index: 260 !important;
-     display: flex !important;
-     transform: translateX(-260px) !important;    /* ← oculto via transform */
-     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
-     box-shadow: none !important;
+    display: flex !important;
+    transform: translateX(-260px) !important;  /* oculto fuera de pantalla */
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+  }
+
+  .sidebar.visible {
+    transform: translateX(0) !important;       /* se desliza adentro */
+    box-shadow: var(--shadow-lg) !important;
   }
   
   .sidebar.visible {
