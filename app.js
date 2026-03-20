@@ -11,7 +11,7 @@ if (typeof auth !== 'undefined') {
 window.app = {
   pantallaActual: 'estimador-screen',
   esAdmin: false,
-  ADMIN_PASSWORD: 'TU_CONTRASEÑA_AQUI', // ⚠️ CAMBIA ESTO EN PRODUCCIÓN
+  usuarioActual: null,
   
   // ─────────────────────────────────────────────────────────────
   // INICIALIZAR APP (OPTIMIZADO)
@@ -20,43 +20,36 @@ window.app = {
     try {
       console.log('🔧 PWA Estimator iniciando...');
       
-      // 1. Cargar tema guardado
+      // Inicializar auth
+      if (window.pwaAuth) {
+        // Sobrescribir callbacks de auth
+        window.pwaAuth.onAuthSuccess = (user) => this.onAuthSuccess(user);
+        window.pwaAuth.onAuthLogout = () => this.onAuthLogout();
+      }
+      
       this.cargarTemaGuardado();
-      
-      // 2. Verificar sesión admin
-      this.verificarSesionAdmin();
-      
-      // 3. Esperar a que DB esté lista
       await this.esperarDB();
       
-      // 4. Configurar sidebars según modo y pantalla
-      this.configurarSidebars();
+      // Verificar sesión (ahora con Firebase Auth)
+      this.verificarSesionAuth();
       
-      // 5. Cargar diagnósticos si es admin
       if (this.esAdmin) {
         await this.cargarDiagnosticos();
       }
       
-      // 6. Mostrar login si no es admin
       if (!this.esAdmin) {
         this.mostrarLogin();
       }
       
-      // 7. Configurar navegación
       this.configurarNavegacion();
-      
-      // 8. ✅ Revelar app (eliminar flash de carga)
       document.body.classList.remove('app-loading');
       
       console.log('✅ PWA Estimator listo');
       console.log('🔐 Modo:', this.esAdmin ? 'ADMIN' : 'CLIENTE');
-      console.log('📱 Pantalla:', window.innerWidth <= 768 ? 'MÓVIL' : 'DESKTOP');
       
     } catch (error) {
       console.error('❌ Error en inicialización:', error);
-      // ✅ Revelar app incluso con error
       document.body.classList.remove('app-loading');
-      this.mostrarToast('❌ Error al iniciar: ' + error.message, 'error');
     }
   },
   
@@ -128,36 +121,28 @@ window.app = {
   // ─────────────────────────────────────────────────────────────
   // VERIFICAR ADMIN (USANDO auth.js)
   // ─────────────────────────────────────────────────────────────
-  verificarAdmin: function() {
+  verificarAdmin: async function() {
+    const emailInput = document.getElementById('admin-email');
     const passwordInput = document.getElementById('admin-password');
+    
+    const email = emailInput?.value || '';
     const password = passwordInput?.value || '';
     
-    // Validar con auth.js
-    if (auth.verificarPassword(password)) {
-      // ✅ Contraseña correcta
-      auth.iniciarSesionAdmin();
-      this.esAdmin = true;
-      
-      // Ocultar login
-      const modal = document.getElementById('login-modal');
-      if (modal) {
-        modal.classList.remove('active');
-        modal.style.display = 'none';
-      }
-      
-      // Mostrar sidebar correcto
-      this.configurarSidebars();
-      
-      // Scroll y feedback
-      window.scrollTo(0, 0);
-      this.cargarDiagnosticos();
-      this.mostrarToast('✅ Bienvenido Admin', 'success');
-      
-      if (passwordInput) passwordInput.value = '';
-      console.log('✅ Admin autenticado vía auth.js');
-      
+    // Validar campos
+    if (!email || !password) {
+      this.mostrarToast('⚠️ Ingresa email y contraseña', 'error');
+      return;
+    }
+    
+    // Login con Firebase Auth
+    const resultado = await window.pwaAuth.login(email, password);
+    
+    if (resultado.exito) {
+      // Auth exitoso - la UI se actualiza en onAuthSuccess()
+      this.mostrarToast('✅ Bienvenido', 'success');
     } else {
-      // ❌ Contraseña incorrecta
+      // Error
+      this.mostrarToast('❌ ' + resultado.error, 'error');
       if (passwordInput) {
         passwordInput.classList.add('error');
         passwordInput.style.borderColor = 'var(--rose)';
@@ -166,10 +151,75 @@ window.app = {
           passwordInput.style.borderColor = '';
         }, 2000);
       }
-      this.mostrarToast('❌ Contraseña incorrecta', 'error');
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // VERIFICAR SESIÓN CON FIREBASE AUTH
+  // ─────────────────────────────────────────────────────────────
+  verificarSesionAuth: function() {
+    const user = window.pwaAuth?.usuarioActual();
+    if (user) {
+      this.esAdmin = true;
+      this.usuarioActual = user;
+      this.onAuthSuccess(user);
     }
   },
   
+  // ─────────────────────────────────────────────────────────────
+  // CALLBACK: AUTH SUCCESS
+  // ─────────────────────────────────────────────────────────────
+  onAuthSuccess: function(user) {
+    this.esAdmin = true;
+    this.usuarioActual = user;
+    
+    // Ocultar login
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+    
+    // Mostrar sidebar admin
+    this.configurarSidebars();
+    
+    // Cargar diagnósticos
+    this.cargarDiagnosticos();
+    
+    console.log('✅ Admin autenticado:', user.email);
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // CALLBACK: AUTH LOGOUT
+  // ─────────────────────────────────────────────────────────────
+  onAuthLogout: function() {
+    this.esAdmin = false;
+    this.usuarioActual = null;
+    
+    // Mostrar login
+    this.mostrarLogin();
+    
+    console.log('🚪 Sesión cerrada');
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // CERRAR SESIÓN (CON FIREBASE AUTH)
+  // ─────────────────────────────────────────────────────────────
+  cerrarSesionAdmin: async function() {
+    if (confirm('¿Cerrar sesión de admin?')) {
+      const resultado = await window.pwaAuth.logout();
+      
+      if (resultado.exito) {
+        this.esAdmin = false;
+        this.usuarioActual = null;
+        this.mostrarLogin();
+        this.mostrarPantalla('estimador-screen');
+        this.mostrarToast('🚪 Sesión cerrada', 'info');
+      } else {
+        this.mostrarToast('❌ Error al cerrar sesión', 'error');
+      }
+    }
+  },
   // ─────────────────────────────────────────────────────────────
   // ENTRAR COMO CLIENTE
   // ─────────────────────────────────────────────────────────────
