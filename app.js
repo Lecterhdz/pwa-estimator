@@ -38,16 +38,12 @@ window.app = {
       // Configurar navegación
       this.configurarNavegacion();
       
-      // ✅ AQUÍ — revelar la app ya lista, sin flash
-      document.body.classList.remove('app-loading');
-      
       console.log('✅ PWA Estimator listo');
       console.log('🔐 Modo:', this.esAdmin ? 'ADMIN' : 'CLIENTE');
       
     } catch (error) {
       console.error('❌ Error en inicialización:', error);
-    // Revelar aunque haya error, para no dejar pantalla en blanco
-    document.body.classList.remove('app-loading');
+
     }
   },
   
