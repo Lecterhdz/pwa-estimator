@@ -3,7 +3,11 @@
 // ═══════════════════════════════════════════════════════════════
 
 console.log('🔧 PWA Estimator app.js cargado');
-
+// AGREGAR ESTO DESPUÉS DEL console.log inicial:
+// Cargar módulo de autenticación
+if (typeof auth !== 'undefined') {
+  console.log('🔐 auth.js disponible');
+}
 window.app = {
   pantallaActual: 'estimador-screen',
   esAdmin: false,
