@@ -181,6 +181,8 @@ input, select, textarea {
   white-space: nowrap !important;
   overflow: visible !important;
   text-overflow: clip !important;
+  flex-shrink: 0 !important;
+  min-width: 0 !important;
 }
 /* ✅ Asegurar que el texto de navegación sea visible */
 .nav-item > span:not(.nav-icon):not(.nav-badge) {
@@ -190,13 +192,25 @@ input, select, textarea {
   text-overflow: clip !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }
 
 .nav-item:hover { 
   background: var(--bg); 
   color: var(--ink);
 }
-
+/* Específicamente para el botón Diagnósticos */
+.nav-item[onclick*="admin-diagnosticos-screen"] {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.nav-item[onclick*="admin-diagnosticos-screen"] > span:not(.nav-icon):not(.nav-badge) {
+  display: inline-block !important;
+  color: var(--ink3) !important;
+}
 .nav-item.active { 
   background: var(--blue-l); 
   color: var(--blue); 
@@ -1698,7 +1712,9 @@ body.tema-claro .topbar-btn.ghost {
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+  #sidebar-admin .nav-item span {
+    display: inline !important;
+  }  
   /* Específicamente el botón Diagnósticos */
   #sidebar-admin .nav-item[onclick*="admin-diagnosticos-screen"] {
     display: flex !important;
