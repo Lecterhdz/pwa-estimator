@@ -51,120 +51,58 @@ window.adminDiagnosticos = {
     }
   },
   
-  // ─────────────────────────────────────────────────────────────
-  // RENDERIZAR TABLA (CORREGIDO + NUEVOS STATUS)
-  // ─────────────────────────────────────────────────────────────
-  renderTabla: function(diagnosticos) {
-    const tbody = document.getElementById('tabla-diagnosticos');
-    if (!tbody) return;
+// ─────────────────────────────────────────────────────────────
+// RENDERIZAR TABLA (ACTUALIZADO - SIN COLUMNA SOLICITUD NI BOTÓN RECHAZAR)
+// ─────────────────────────────────────────────────────────────
+renderTabla: function(diagnosticos) {
+  const tbody = document.getElementById('tabla-diagnosticos');
+  if (!tbody) return;
+  
+  if (!diagnosticos || diagnosticos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--ink4);">📭 Sin diagnósticos registrados aún</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = diagnosticos.map(d => {
+    const fecha = new Date(d.fecha || d.timestamp).toLocaleDateString('es-MX', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
     
-    if (!diagnosticos || diagnosticos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="padding:40px;text-align:center;color:var(--ink4);">📭 Sin diagnósticos registrados aún</td></tr>';
-      return;
-    }
+    const nivelColor = this.getColorNivel(d.resultado?.nivel);
+    const semanas = d.resultado?.semanas || 'Por definir';
+    const semanasTexto = semanas.includes('semana') ? semanas : `${semanas} semanas`;
     
-    tbody.innerHTML = diagnosticos.map(d => {
-      const fecha = new Date(d.fecha || d.timestamp).toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      
-      const nivelColor = this.getColorNivel(d.resultado?.nivel);
-      const semanas = d.resultado?.semanas || 'Por definir';
-      // Asegurar que siempre diga "semanas"
-      const semanasTexto = semanas.includes('semana') ? semanas : `${semanas} semanas`;
-      
-      // Status del proyecto
-      const status = d.status || 'pendiente';
-      const statusBadge = this.getStatusBadge(status, d.fechaEntrega);
-      
-      // Solicitud enviada
-      const solicitudBadge = d.solicitudEnviada 
-        ? '<span class="badge-solicitud enviada">✅ Enviada</span>' 
-        : '<span class="badge-solicitud pendiente">⏳ Pendiente</span>';
-      
-      return `
-        <tr style="border-bottom:1px solid var(--border);transition:background 0.2s;">
-          <td style="padding:12px;font-family:var(--mono);font-size:12px;">${fecha}</td>
-          <td style="padding:12px;font-weight:600;">${d.cliente?.empresa || '—'}</td>
-          <td style="padding:12px;">${d.cliente?.email || '—'}</td>
-          <td style="padding:12px;">${d.cliente?.industria || '—'}</td>
-          <td style="padding:12px;">
-            <span class="badge-nivel ${d.resultado?.nivel?.toLowerCase()}" style="background:${nivelColor};color:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;">
-              ${d.resultado?.nivel || '—'}
-            </span>
-          </td>
-          <td style="padding:12px;font-family:var(--mono);font-size:12px;">${semanasTexto}</td>
-          <td style="padding:12px;">${solicitudBadge}</td>
-          <td style="padding:12px;">${statusBadge}</td>
-          <td style="padding:12px;">
-            <div class="tabla-acciones">
-              <button onclick="adminDiagnosticos.contactar('${d.id}', '${d.cliente?.email || ''}')" 
-                class="tabla-btn contactar" title="Contactar cliente">
-                📧
-              </button>
-              <button onclick="adminDiagnosticos.verDetalle('${d.id}')" 
-                class="tabla-btn ver" title="Ver detalles">
-                👁️
-              </button>
-              <button onclick="adminDiagnosticos.cambiarStatus('${d.id}')" 
-                class="tabla-btn status" title="Cambiar status">
-                📊
-              </button>
-              <button onclick="adminDiagnosticos.rechazarDiagnostico('${d.id}')" 
-                class="tabla-btn delete" 
-                title="Marcar como rechazada" 
-                style="background:var(--rose);color:white;">
-                ❌
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  },
-  // ─────────────────────────────────────────────────────────────
-  // RECHAZAR DIAGNÓSTICO (CAMBIAR STATUS A RECHAZADA)
-  // ─────────────────────────────────────────────────────────────
-  rechazarDiagnostico: async function(id) {
-    const confirmar = confirm(
-      `❌ ¿Marcar este diagnóstico como RECHAZADO?\n\n` +
-      `El cliente será notificado que su cotización no fue aceptada.\n\n` +
-      `ID: ${id}`
-    );
+    const status = d.status || 'pendiente';
+    const statusBadge = this.getStatusBadge(status, d.fechaEntrega);
     
-    if (!confirmar) return;
-    
-    try {
-      let diagnostico = this.diagnosticosCache?.find(d => (d.id || d._id) === id);
-      
-      if (!diagnostico && window.db?.diagnosticos?.get) {
-        diagnostico = await window.db.diagnosticos.get(id);
-      }
-      
-      if (!diagnostico) {
-        alert('❌ Diagnóstico no encontrado');
-        return;
-      }
-      
-      // Actualizar status
-      diagnostico.status = 'rechazada';
-      diagnostico.fechaRechazo = new Date().toISOString();
-      diagnostico.motivoRechazo = prompt('Motivo del rechazo (opcional):') || 'No especificado';
-      
-      await window.db.diagnosticos.add(diagnostico);
-      
-      alert('✅ Diagnóstico marcado como RECHAZADO');
-      this.cargar();
-      
-    } catch (error) {
-      console.error('❌ Error rechazando diagnóstico:', error);
-      alert('❌ Error: ' + error.message);
-    }
-  },
+    return `
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px;font-family:var(--mono);font-size:12px;">${fecha}</td>
+        <td style="padding:12px;font-weight:600;">${d.cliente?.empresa || '—'}</td>
+        <td style="padding:12px;">${d.cliente?.email || '—'}</td>
+        <td style="padding:12px;">${d.cliente?.industria || '—'}</td>
+        <td style="padding:12px;">
+          <span class="badge-nivel ${d.resultado?.nivel?.toLowerCase()}" 
+            style="background:${nivelColor};color:white;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;">
+            ${d.resultado?.nivel || '—'}
+          </span>
+        </td>
+        <td style="padding:12px;font-family:var(--mono);font-size:12px;">${semanasTexto}</td>
+        <td style="padding:12px;">${statusBadge}</td>
+        <td style="padding:12px;">
+          <div class="tabla-acciones">
+            <button onclick="adminDiagnosticos.verDetalle('${d.id}')" 
+              class="tabla-btn ver" title="Ver detalles">👁️</button>
+            <button onclick="adminDiagnosticos.cambiarStatus('${d.id}')" 
+              class="tabla-btn status" title="Cambiar estado">📊</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+},
+  
   // ─────────────────────────────────────────────────────────────
   // CAMBIAR STATUS DEL PROYECTO (CORREGIDO - ACTUALIZA, NO CREA)
   // ─────────────────────────────────────────────────────────────
