@@ -289,16 +289,11 @@ window.app = {
       this.pantallaActual = pantallaId;
     }
     
-    // Actualizar topbar
-    this.actualizarTopbar(pantallaId);
-    
     // Actualizar menú activo (SOLO cambia clase 'active', NO remueve elementos)
     document.querySelectorAll('.nav-item').forEach(item => {
       item.classList.remove('active');
     });
-    
-    // Buscar el nav-item correcto por data-pantalla (más confiable que onclick)
-    const navItem = document.querySelector(`.nav-item[data-pantalla="${pantallaId}"]`);
+    const navItem = document.querySelector(`.nav-item[onclick*="${pantallaId}"]`);
     if (navItem) {
       navItem.classList.add('active');
     }
