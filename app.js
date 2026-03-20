@@ -16,9 +16,6 @@ window.app = {
     try {
       console.log('🔧 PWA Estimator iniciando...');
       
-      // Forzar scroll al inicio
-      window.scrollTo(0, 0);
-      
       // Cargar tema guardado
       this.cargarTemaGuardado();
       
