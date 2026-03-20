@@ -1554,185 +1554,290 @@ body.tema-claro .topbar-btn.ghost {
 }
 
 /* ══════════════════════════════════════ RESPONSIVE UNIFICADO ══════════════════════════════════════ */
-/* ══════════════════════════════════════ RESPONSIVE - MÓVIL (768px) ══════════════════════════════════════ */
-@media (max-width: 768px) {
-  .layout { 
-    grid-template-columns: 1fr; 
+/* ══════════════════════════════════════ DESKTOP (min 1025px) ══════════════════════════════════════ */
+@media (min-width: 1025px) {
+  .sidebar {
+    position: sticky !important;
+    left: 0 !important;
+    display: flex !important; /* Sidebar visible siempre en desktop */
   }
-  .cot-layout { 
-    grid-template-columns: 1fr !important; 
+  .hamburger-btn { 
+    display: none !important; /* Hamburguesa oculta en desktop */
   }
-  .content { 
-    padding: 16px 16px 90px !important; 
-  }
-  .sidebar { 
-    position: fixed; 
-    left: -260px; 
-    top: 0; 
-    bottom: 0; 
-    width: 260px; 
-    z-index: 260; 
-    transition: left .28s cubic-bezier(.4,0,.2,1); 
-    box-shadow: none; 
-  }
-  .sidebar.open { 
-    left: 0; 
-    box-shadow: var(--shadow-lg); 
-  }
-  .hamburger { 
-    display: flex !important; 
-    flex-direction: column; 
-    justify-content: center; 
+  .sidebar-overlay { 
+    display: none !important; 
   }
   .bottom-nav { 
-    display: block !important; 
+    display: none !important; 
   }
+}
+/* ══════════════════════════════════════ MÓVIL (max 768px) - ADAPTADO DE SMARTCOT ══════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Layout: contenido ocupa todo */
+  .layout { 
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "main" !important;
+  }
+  
+  /* Sidebar: oculto con slide-in (enfoque SmartCot) */
+  .sidebar {
+    position: fixed !important;
+    left: -260px !important; /* Oculto a la izquierda */
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    z-index: 260 !important;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Animación suave */
+    box-shadow: none !important;
+    display: flex !important; /* Mantener flex para contenido interno */
+  }
+  
+  .sidebar.visible {
+    left: 0 !important; /* Se desliza hacia adentro */
+    box-shadow: var(--shadow-lg) !important;
+  }
+  
+  /* Overlay para cerrar al tocar fuera */
+  .sidebar-overlay {
+    display: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 250 !important;
+  }
+  .sidebar-overlay.active {
+    display: block !important;
+  }
+  
+  /* Main y Content */
+  .main { 
+    width: 100% !important; 
+    margin-left: 0 !important; 
+  }
+  .content { 
+    padding: 16px 16px 90px !important; /* Padding extra para bottom-nav */
+    width: 100% !important;
+    min-height: calc(100vh - 54px) !important;
+  }
+  
+  /* Topbar compacta */
   .topbar { 
-    padding: 0 16px; 
-    height: 54px; 
+    padding: 0 16px !important; 
+    height: 54px !important; 
   }
   .topbar-title { 
-    font-size: 15px; 
+    font-size: 15px !important; 
   }
   .topbar-sub { 
-    display: none; 
+    display: none !important; 
+  }
+  .topbar-right { 
+    gap: 8px !important; 
   }
   .topbar-right .topbar-btn { 
-    width: auto !important; 
-    min-height: 44px !important; 
-    font-size: 12px !important; 
+    min-width: 40px !important; 
     padding: 8px 12px !important; 
+    font-size: 12px !important; 
   }
-  .topbar-btn.ghost { 
-    display: none; 
+  .topbar-right .topbar-btn span:not(.nav-icon) { 
+    display: none !important; /* Solo íconos en móvil */
   }
-  .btn-guardar, 
-  .res-panel button { 
-    width: 100% !important; 
-    min-height: 48px !important; 
-    font-size: 14px !important; 
-    padding: 12px 16px !important; 
+  
+  /* Mostrar hamburguesa */
+  .hamburger-btn {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: var(--ink) !important;
+    font-size: 20px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
   }
+  
+  /* Stats en grid 2 columnas */
   .stats-row { 
-    grid-template-columns: 1fr 1fr; 
-    gap: 10px; 
-    margin-bottom: 16px; 
+    grid-template-columns: 1fr 1fr !important; 
+    gap: 10px !important; 
+    margin-bottom: 16px !important; 
   }
   .stat-card { 
-    padding: 14px; 
+    padding: 14px !important; 
   }
   .stat-number { 
-    font-size: 26px; 
+    font-size: 26px !important; 
   }
+  
+  /* Dashboard grid 1 columna */
   .dashboard-grid { 
-    grid-template-columns: 1fr; 
-    gap: 14px; 
+    grid-template-columns: 1fr !important; 
+    gap: 14px !important; 
   }
+  
+  /* Forms en 1 columna */
   .form-grid { 
     grid-template-columns: 1fr !important; 
   }
   .form-grid > .f-group[style*="span 2"] { 
     grid-column: span 1 !important; 
   }
-  .summary-panel { 
-    position: static; 
+  
+  /* Summary panel estático */
+  .estimador-resumen,
+  .resultado-pago-info {
+    position: static !important; 
     width: 100% !important; 
   }
-  .sum-total .t-value { 
-    font-size: 18px !important; 
+  
+  /* Tablas con scroll horizontal */
+  .table-responsive { 
+    overflow-x: auto !important; 
+    -webkit-overflow-scrolling: touch !important;
+    margin: 0 -16px !important;
+    padding: 0 16px !important;
   }
-  .sum-time { 
-    grid-template-columns: 1fr 1fr 1fr !important; 
-    gap: 6px !important; 
+  .tabla-diagnosticos { 
+    min-width: 600px !important; 
+    font-size: 12px !important;
   }
-  .sum-time-item { 
-    padding: 8px !important; 
+  .tabla-diagnosticos th,
+  .tabla-diagnosticos td { 
+    padding: 10px 8px !important; 
+    white-space: nowrap !important; 
   }
-  .table-wrap { 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch;
+  
+  /* Toolbar de tabla apilada */
+  .admin-filtros { 
+    flex-direction: column !important; 
+    align-items: stretch !important; 
+    gap: 10px !important; 
   }
-  table { 
-    min-width: 600px; 
+  .admin-filtros .f-select,
+  .admin-filtros .f-date { 
+    max-width: 100% !important; 
   }
-  .table-toolbar { 
-    flex-direction: column; 
-    align-items: stretch; 
-    gap: 10px; 
-  }
-  .table-search { 
-    max-width: 100%; 
-  }
-  .cot-layout > div { 
-    min-width: 0; 
-    width: 100%; 
-  }
-  #conceptos-seleccionados { 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch; 
-  }
-  .f-input { 
+  
+  /* Inputs más grandes para touch */
+  .f-input, 
+  .f-select, 
+  .topbar-btn { 
     min-height: 48px !important; 
     font-size: 14px !important; 
   }
-  .material-item > div,
-  .mano-obra-item > div,
-  .equipo-item > div,
-  .indirecto-item > div {
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
+  
+  /* Checkboxes/radios más grandes */
+  input[type="checkbox"],
+  input[type="radio"] { 
+    width: 20px !important; 
+    height: 20px !important; 
+    accent-color: var(--blue); 
   }
-  .material-item input,
-  .mano-obra-item input,
-  .equipo-item input,
-  .indirecto-item input {
-    width: 100% !important;
-    min-height: 44px !important;
+  
+  /* Steps con scroll horizontal */
+  .estimador-progress { 
+    overflow-x: auto !important; 
+    -webkit-overflow-scrolling: touch !important; 
+    padding-bottom: 8px !important; 
   }
-  .material-item button,
-  .mano-obra-item button,
-  .equipo-item button,
-  .indirecto-item button {
-    width: 100% !important;
-    margin-top: 8px !important;
+  .step { 
+    padding: 6px 12px !important; 
+    font-size: 11px !important; 
+    white-space: nowrap !important; 
   }
-  .quick-actions { 
-    grid-template-columns: 1fr; 
+  
+  /* Cards en 1 columna */
+  .tipos-pwa-grid,
+  .disciplinas-grid,
+  .componentes-grid,
+  .modulos-grid,
+  .escala-options { 
+    grid-template-columns: 1fr !important; 
+    gap: 12px !important; 
   }
-  .qa-btn { 
-    min-height: 48px; 
+  
+  /* Botones en columna */
+  .estimador-buttons,
+  .resultado-buttons { 
+    flex-direction: column !important; 
+    gap: 10px !important; 
   }
-}
-
-/* ══════════════════════════════════════ MÓVIL PEQUEÑO (480px) ══════════════════════════════════════ */
-@media (max-width: 480px) {
-  .topbar-title {
-    font-size: 14px !important;
+  .estimador-buttons .topbar-btn,
+  .resultado-buttons .topbar-btn { 
+    width: 100% !important; 
+    justify-content: center !important; 
   }
-  .stat-number {
-    font-size: 24px !important;
+  
+  /* Login modal ajustado */
+  .login-modal-content { 
+    width: 95% !important; 
+    max-width: 360px !important; 
+    padding: 30px 20px !important; 
   }
-  .summary-header h3 {
-    font-size: 15px !important;
+  .login-modal-header h2 { 
+    font-size: 18px !important; 
   }
-  .sum-total .t-value {
-    font-size: 16px !important;
+  
+  /* Módulos details */
+  .modulo-seccion summary { 
+    padding: 12px !important; 
+    font-size: 13px !important; 
   }
-  button[onclick*="dashboard-screen"] {
-    padding: 8px 12px !important;
-    font-size: 12px !important;
-    min-height: 44px !important;
+  .modulos-grid { 
+    padding: 12px !important; 
   }
-  .card-body {
-    padding: 0 16px 16px !important;
+  
+  /* Cards compactas */
+  .tipo-pwa-content,
+  .base-content,
+  .disciplina-card-content { 
+    padding: 16px 14px !important; 
   }
-  .form-section-body {
-    padding: 16px !important;
+  .tipo-icon,
+  .disciplina-icon { 
+    font-size: 2rem !important; 
   }
-}
-
-/* ANIMACIONES */
-@keyframes slideIn {
-  from { left: -280px; }
-  to { left: 0; }
+  
+  /* Resumen compacto */
+  .resumen-row { 
+    font-size: 12px !important; 
+  }
+  .resumen-value.precio { 
+    font-size: 14px !important; 
+  }
+  
+  /* Bottom Navigation (si la usas) */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    z-index: 150;
+    justify-content: space-around;
+  }
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: var(--ink3);
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .bottom-nav-item.active {
+    color: var(--blue);
+  }
+  .bottom-nav-item .bn-icon {
+    font-size: 20px;
+  }
 }
