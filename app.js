@@ -401,12 +401,18 @@ window.app = {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('sidebar-overlay');
     
-    if (sidebar) sidebar.classList.toggle('visible');
-    if (overlay) overlay.classList.toggle('active');
+    if (!sidebar) return;
+    
+    // Toggle clase .visible (no .open como en SmartCot)
+    sidebar.classList.toggle('visible');
+    
+    if (overlay) {
+      overlay.classList.toggle('active');
+    }
     
     // Prevenir scroll del body cuando sidebar está abierto
-    document.body.style.overflow = sidebar?.classList.contains('visible') ? 'hidden' : '';
-  }, 
+    document.body.style.overflow = sidebar.classList.contains('visible') ? 'hidden' : '';
+  },
   // ─────────────────────────────────────────────────────────────
   // TOGGLE TEMA (CLARO/OSCURO)
   // ─────────────────────────────────────────────────────────────
