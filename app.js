@@ -376,21 +376,32 @@ window.app = {
       }
     });
   },
+  // ─────────────────────────────────────────────────────────────
+  // TOGGLE SIDEBAR (MÓVIL) - CORREGIDO PARA 2 SIDEBARS
+  // ─────────────────────────────────────────────────────────────
   toggleSidebar: function() {
-    // Seleccionar el sidebar que esté visible o el correspondiente al modo actual
-    const sidebar = document.querySelector('.sidebar.visible') || 
-                    document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
+    // Determinar qué sidebar mostrar según el modo actual
+    const sidebarId = this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente';
+    const sidebar = document.getElementById(sidebarId);
+    const overlay = document.getElementById('sidebar-overlay');
     
-    if (!sidebar) return;
+    if (!sidebar) {
+      console.error('❌ Sidebar no encontrado:', sidebarId);
+      return;
+    }
     
+    // Toggle clase .visible en el sidebar correcto
     sidebar.classList.toggle('visible');
     
-    const overlay = document.getElementById('sidebar-overlay');
+    // Toggle overlay
     if (overlay) {
       overlay.classList.toggle('active');
     }
     
+    // Prevenir scroll del body cuando sidebar está abierto
     document.body.style.overflow = sidebar.classList.contains('visible') ? 'hidden' : '';
+    
+    console.log('🔍 Sidebar toggle:', sidebarId, sidebar.classList.contains('visible') ? 'ABIERTO' : 'CERRADO');
   },
   // ─────────────────────────────────────────────────────────────
   // TOGGLE TEMA (CLARO/OSCURO)
