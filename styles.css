@@ -1685,6 +1685,11 @@ body.tema-claro .topbar-btn.ghost {
     position: sticky !important;
     left: 0 !important;
     width: 260px !important;
+    width: 240px !important;
+    transform: none !important;      /* ← ESTA ES LA CLAVE */
+    transition: none !important;
+    box-shadow: none !important;
+    height: 100vh !important;
   }
   
   /* Asegurar que los nav-items dentro sean visibles */
