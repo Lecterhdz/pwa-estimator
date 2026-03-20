@@ -1602,17 +1602,10 @@ body.tema-claro .topbar-btn.ghost {
     box-shadow: none !important;
     visibility: visible !important;
   }
-
-  .sidebar.visible {
-    transform: translateX(0) !important;       /* se desliza adentro */
-    box-shadow: var(--shadow-lg) !important;
-  }
-  
   .sidebar.visible {
     transform: translateX(0) !important;         /* ← se desliza */
     box-shadow: var(--shadow-lg) !important;
   }
-  
   /* Overlay para cerrar al tocar fuera */
   .sidebar-overlay {
     display: none !important;
