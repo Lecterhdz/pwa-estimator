@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// PWA ESTIMATOR - BASE DE DATOS (Firebase + IndexedDB)
+// PWA ESTIMATOR - BASE DE DATOS (Firebase + IndexedDB) - CORREGIDO
 // ═══════════════════════════════════════════════════════════════
 
 console.log('💾 db.js cargado');
@@ -25,28 +25,46 @@ async function inicializarDB() {
     // Crear objeto db con métodos para diagnosticos
     window.db = {
       diagnosticos: {
+        // ✅ CORREGIDO: Si el doc tiene id, usa SET (update), si no, usa ADD (create)
         add: async (doc) => {
-          const id = await db.collection('diagnosticos').add(doc);
-          return id.id;
+          try {
+            if (doc.id) {
+              // ✅ ACTUALIZAR documento existente
+              await db.collection('diagnosticos').doc(doc.id).set(doc, { merge: true });
+              return doc.id;
+            } else {
+              // ✅ CREAR nuevo documento
+              const newDoc = await db.collection('diagnosticos').add(doc);
+              return newDoc.id;
+            }
+          } catch (error) {
+            console.error('❌ Error en add():', error);
+            throw error;
+          }
         },
+        
         count: async () => {
           const snapshot = await db.collection('diagnosticos').get();
           return snapshot.size;
         },
+        
         get: async (id) => {
           const doc = await db.collection('diagnosticos').doc(id).get();
           return doc.exists ? { id: doc.id, ...doc.data() } : null;
         },
+        
         toArray: async () => {
           const snapshot = await db.collection('diagnosticos').orderBy('timestamp', 'desc').limit(100).get();
           return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         },
+        
         clear: async () => {
           const snapshot = await db.collection('diagnosticos').get();
           const batch = db.batch();
           snapshot.docs.forEach(doc => batch.delete(doc.ref));
           await batch.commit();
         },
+        
         orderBy: function(field, direction) {
           return {
             limit: (count) => ({
@@ -109,19 +127,21 @@ async function inicializarIndexedDB() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CREATE DIAGNOSTICOS STORE HELPER
+// CREATE DIAGNOSTICOS STORE HELPER (IndexedDB)
 // ─────────────────────────────────────────────────────────────
 function createDiagnosticosStore(db) {
   return {
+    // ✅ CORREGIDO: Si el doc tiene id, usa put() (update), si no, usa add() (create)
     add: async (doc) => {
       return new Promise((resolve, reject) => {
         const tx = db.transaction('diagnosticos', 'readwrite');
         const store = tx.objectStore('diagnosticos');
-        const request = store.add(doc);
+        const request = doc.id ? store.put(doc) : store.add(doc);
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
     },
+    
     count: async () => {
       return new Promise((resolve, reject) => {
         const tx = db.transaction('diagnosticos', 'readonly');
@@ -131,6 +151,7 @@ function createDiagnosticosStore(db) {
         request.onerror = () => reject(request.error);
       });
     },
+    
     get: async (id) => {
       return new Promise((resolve, reject) => {
         const tx = db.transaction('diagnosticos', 'readonly');
@@ -140,6 +161,7 @@ function createDiagnosticosStore(db) {
         request.onerror = () => reject(request.error);
       });
     },
+    
     toArray: async () => {
       return new Promise((resolve, reject) => {
         const tx = db.transaction('diagnosticos', 'readonly');
@@ -152,6 +174,7 @@ function createDiagnosticosStore(db) {
         request.onerror = () => reject(request.error);
       });
     },
+    
     clear: async () => {
       return new Promise((resolve, reject) => {
         const tx = db.transaction('diagnosticos', 'readwrite');
@@ -161,6 +184,7 @@ function createDiagnosticosStore(db) {
         request.onerror = () => reject(request.error);
       });
     },
+    
     orderBy: function(field, direction) {
       return {
         limit: (count) => ({
