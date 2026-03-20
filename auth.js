@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// PWA ESTIMATOR - AUTENTICACIÓN FIREBASE (COMPAT)
+// PWA ESTIMATOR - AUTENTICACIÓN (CORREGIDO)
 // ═══════════════════════════════════════════════════════════════
 
 console.log('🔐 auth.js cargado');
@@ -7,21 +7,30 @@ console.log('🔐 auth.js cargado');
 window.pwaAuth = {
   auth: null,
   db: null,
+  initialized: false,
   
   // ─────────────────────────────────────────────────────────────
-  // INICIALIZAR AUTH
+  // INICIALIZAR AUTH (CON MANEJO DE ERRORES)
   // ─────────────────────────────────────────────────────────────
   init: function() {
     try {
       // Verificar que Firebase esté disponible
       if (typeof firebase === 'undefined') {
-        console.error('❌ Firebase no está disponible');
+        console.warn('⚠️ Firebase no disponible, auth desactivado');
         return false;
       }
       
-      // Inicializar Auth y Firestore (versión compat)
+      // Verificar que Firebase Auth esté disponible
+      if (typeof firebase.auth !== 'function') {
+        console.warn('⚠️ Firebase Auth no disponible, auth desactivado');
+        console.warn('📌 Verifica que firebase-auth-compat.js esté cargado');
+        return false;
+      }
+      
+      // Inicializar Auth y Firestore
       this.auth = firebase.auth();
       this.db = firebase.firestore();
+      this.initialized = true;
       
       console.log('✅ Firebase Auth inicializado');
       
@@ -40,6 +49,7 @@ window.pwaAuth = {
       
     } catch (error) {
       console.error('❌ Error inicializando Auth:', error);
+      this.initialized = false;
       return false;
     }
   },
@@ -48,25 +58,17 @@ window.pwaAuth = {
   // LOGIN CON EMAIL/PASSWORD
   // ─────────────────────────────────────────────────────────────
   login: async function(email, password) {
+    if (!this.initialized) {
+      return { exito: false, error: 'Auth no inicializado' };
+    }
+    
     try {
-      if (!this.auth) {
-        return { exito: false, error: 'Auth no inicializado' };
-      }
-      
       const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
       console.log('✅ Login exitoso:', userCredential.user.email);
-      
-      return { 
-        exito: true, 
-        user: userCredential.user 
-      };
-      
+      return { exito: true, user: userCredential.user };
     } catch (error) {
       console.error('❌ Error login:', error.code, error.message);
-      return { 
-        exito: false, 
-        error: this.mapearErrorAuth(error.code) 
-      };
+      return { exito: false, error: this.mapearErrorAuth(error.code) };
     }
   },
   
@@ -74,16 +76,14 @@ window.pwaAuth = {
   // CERRAR SESIÓN
   // ─────────────────────────────────────────────────────────────
   logout: async function() {
+    if (!this.initialized) {
+      return { exito: false, error: 'Auth no inicializado' };
+    }
+    
     try {
-      if (!this.auth) {
-        return { exito: false, error: 'Auth no inicializado' };
-      }
-      
       await this.auth.signOut();
       console.log('🚪 Sesión cerrada');
-      
       return { exito: true };
-      
     } catch (error) {
       console.error('❌ Error logout:', error);
       return { exito: false, error: error.message };
@@ -94,7 +94,7 @@ window.pwaAuth = {
   // USUARIO ACTUAL
   // ─────────────────────────────────────────────────────────────
   usuarioActual: function() {
-    if (!this.auth) return null;
+    if (!this.initialized || !this.auth) return null;
     return this.auth.currentUser;
   },
   
@@ -108,22 +108,19 @@ window.pwaAuth = {
       'auth/user-not-found': 'Usuario no encontrado',
       'auth/wrong-password': 'Contraseña incorrecta',
       'auth/invalid-credential': 'Credenciales inválidas',
-      'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
+      'auth/too-many-requests': 'Demasiados intentos',
       'auth/network-request-failed': 'Error de conexión'
     };
     return errores[codigo] || 'Error de autenticación';
   },
   
-  // ─────────────────────────────────────────────────────────────
-  // CALLBACKS (se sobrescriben en app.js)
-  // ─────────────────────────────────────────────────────────────
+  // Callbacks (se sobrescriben en app.js)
   onAuthSuccess: null,
   onAuthLogout: null
 };
 
 // Inicializar cuando el DOM esté listo
 if (typeof firebase !== 'undefined') {
-  // Esperar un poco para asegurar que Firebase esté listo
   setTimeout(() => {
     window.pwaAuth.init();
   }, 100);
