@@ -60,7 +60,7 @@ window.app = {
   // CONFIGURAR SIDEBARS (NUEVA FUNCIÓN - RESPONSIVE)
   // ─────────────────────────────────────────────────────────────
   configurarSidebars: function() {
-    const esMovil = window.innerWidth <= 768;
+    const esMovil = window.innerWidth <= 680;
     const sidebarAdmin = document.getElementById('sidebar-admin');
     const sidebarCliente = document.getElementById('sidebar-cliente');
     
@@ -297,7 +297,7 @@ window.app = {
     }
     
     // En móvil: cerrar sidebar después de navegar
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 680) {
       const sidebar = document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
       const overlay = document.getElementById('sidebar-overlay');
       sidebar?.classList.remove('visible');
@@ -363,7 +363,7 @@ window.app = {
     // Escape para cerrar modals/sidebar
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 680) {
           const sidebar = document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
           const overlay = document.getElementById('sidebar-overlay');
           sidebar?.classList.remove('visible');
@@ -380,7 +380,7 @@ window.app = {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         // Solo ajustar si cambió de móvil a desktop o viceversa
-        const esMovilAhora = window.innerWidth <= 768;
+        const esMovilAhora = window.innerWidth <= 680;
         const sidebarAdmin = document.getElementById('sidebar-admin');
         const sidebarCliente = document.getElementById('sidebar-cliente');
         
