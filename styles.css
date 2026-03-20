@@ -56,7 +56,10 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-
+/* Oculta todo hasta que JS inicialice — elimina el flash */
+body.app-loading .layout {
+  visibility: hidden !important;
+}
 /* ══════════════════════════════════════ SCROLLBAR ══════════════════════════════════════ */
 ::-webkit-scrollbar { 
   width: 5px; 
