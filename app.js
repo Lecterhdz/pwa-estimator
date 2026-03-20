@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// PWA ESTIMATOR - APLICACIÓN PRINCIPAL (CORREGIDO)
+// PWA ESTIMATOR - APLICACIÓN PRINCIPAL (OPTIMIZADO)
 // ═══════════════════════════════════════════════════════════════
 
 console.log('🔧 PWA Estimator app.js cargado');
@@ -7,43 +7,83 @@ console.log('🔧 PWA Estimator app.js cargado');
 window.app = {
   pantallaActual: 'estimador-screen',
   esAdmin: false,
-  ADMIN_PASSWORD: 'TU_CONTRASEÑA_AQUI', // ⚠️ CAMBIA ESTO
+  ADMIN_PASSWORD: 'TU_CONTRASEÑA_AQUI', // ⚠️ CAMBIA ESTO EN PRODUCCIÓN
   
   // ─────────────────────────────────────────────────────────────
-  // INICIALIZAR APP
+  // INICIALIZAR APP (OPTIMIZADO)
   // ─────────────────────────────────────────────────────────────
   init: async function() {
     try {
       console.log('🔧 PWA Estimator iniciando...');
       
-      // Cargar tema guardado
+      // 1. Cargar tema guardado
       this.cargarTemaGuardado();
       
-      // Verificar sesión admin
+      // 2. Verificar sesión admin
       this.verificarSesionAdmin();
       
-      // Esperar a que DB esté lista
+      // 3. Esperar a que DB esté lista
       await this.esperarDB();
       
-      // Si es admin, cargar diagnósticos
+      // 4. Configurar sidebars según modo y pantalla
+      this.configurarSidebars();
+      
+      // 5. Cargar diagnósticos si es admin
       if (this.esAdmin) {
         await this.cargarDiagnosticos();
       }
       
-      // Mostrar login si no es admin
+      // 6. Mostrar login si no es admin
       if (!this.esAdmin) {
         this.mostrarLogin();
       }
       
-      // Configurar navegación
+      // 7. Configurar navegación
       this.configurarNavegacion();
+      
+      // 8. ✅ Revelar app (eliminar flash de carga)
+      document.body.classList.remove('app-loading');
       
       console.log('✅ PWA Estimator listo');
       console.log('🔐 Modo:', this.esAdmin ? 'ADMIN' : 'CLIENTE');
+      console.log('📱 Pantalla:', window.innerWidth <= 768 ? 'MÓVIL' : 'DESKTOP');
       
     } catch (error) {
       console.error('❌ Error en inicialización:', error);
-
+      // ✅ Revelar app incluso con error
+      document.body.classList.remove('app-loading');
+      this.mostrarToast('❌ Error al iniciar: ' + error.message, 'error');
+    }
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // CONFIGURAR SIDEBARS (NUEVA FUNCIÓN - RESPONSIVE)
+  // ─────────────────────────────────────────────────────────────
+  configurarSidebars: function() {
+    const esMovil = window.innerWidth <= 768;
+    const sidebarAdmin = document.getElementById('sidebar-admin');
+    const sidebarCliente = document.getElementById('sidebar-cliente');
+    
+    if (this.esAdmin) {
+      // Modo admin
+      if (sidebarAdmin) {
+        if (esMovil) {
+          sidebarAdmin.classList.remove('visible'); // En móvil: oculto hasta que se abra
+        } else {
+          sidebarAdmin.classList.add('visible'); // En desktop: visible siempre
+        }
+      }
+      if (sidebarCliente) sidebarCliente.classList.remove('visible');
+    } else {
+      // Modo cliente
+      if (sidebarCliente) {
+        if (esMovil) {
+          sidebarCliente.classList.remove('visible');
+        } else {
+          sidebarCliente.classList.add('visible');
+        }
+      }
+      if (sidebarAdmin) sidebarAdmin.classList.remove('visible');
     }
   },
   
@@ -64,32 +104,25 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // MOSTRAR LOGIN (CORREGIDO)
+  // MOSTRAR LOGIN
   // ─────────────────────────────────────────────────────────────
   mostrarLogin: function() {
     const modal = document.getElementById('login-modal');
     if (modal) {
-      modal.style.display = 'flex';
-      modal.style.visibility = 'visible';
-      modal.style.opacity = '1';
       modal.classList.add('active');
+      modal.style.display = 'flex';
     }
     
-    // Ocultar AMBOS sidebars
-    const sidebarAdmin = document.getElementById('sidebar-admin');
-    const sidebarCliente = document.getElementById('sidebar-cliente');
+    // Ocultar ambos sidebars
+    document.getElementById('sidebar-admin')?.classList.remove('visible');
+    document.getElementById('sidebar-cliente')?.classList.remove('visible');
     
-    if (sidebarAdmin)  sidebarAdmin.classList.remove('visible');
-    if (sidebarCliente) sidebarCliente.classList.remove('visible');
-    
-    // Forzar scroll al inicio
     window.scrollTo(0, 0);
-    
     console.log('🔐 Login mostrado');
   },
   
   // ─────────────────────────────────────────────────────────────
-  // VERIFICAR ADMIN (CORREGIDO - MODAL SÍ SE OCULTA)
+  // VERIFICAR ADMIN
   // ─────────────────────────────────────────────────────────────
   verificarAdmin: function() {
     const passwordInput = document.getElementById('admin-password');
@@ -102,102 +135,65 @@ window.app = {
       
       this.esAdmin = true;
       
-      // ⚠️ OCULTAR LOGIN COMPLETAMENTE
+      // Ocultar login
       const modal = document.getElementById('login-modal');
       if (modal) {
-        modal.style.setProperty('display', 'none', 'important');
-        modal.style.visibility = 'hidden';
-        modal.style.opacity = '0';
         modal.classList.remove('active');
+        modal.style.display = 'none';
       }
       
-      // ⚠️ MOSTRAR SIDEBAR ADMIN
-      const sidebarAdmin = document.getElementById('sidebar-admin');
-      const sidebarCliente = document.getElementById('sidebar-cliente');
+      // Mostrar sidebar correcto
+      this.configurarSidebars();
       
-      if (sidebarAdmin)  sidebarAdmin.classList.add('visible');
-      if (sidebarCliente) sidebarCliente.classList.remove('visible');
-      
-      // ⚠️ FORZAR SCROLL AL INICIO
+      // Scroll al inicio
       window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
       
       // Cargar diagnósticos
       this.cargarDiagnosticos();
       
-      // Mostrar toast
+      // Feedback
       this.mostrarToast('✅ Bienvenido Admin', 'success');
-      
-      // Limpiar input
       if (passwordInput) passwordInput.value = '';
       
       console.log('✅ Admin autenticado');
       
     } else {
-      // Contraseña incorrecta
+      // Error de contraseña
       if (passwordInput) {
         passwordInput.classList.add('error');
         passwordInput.style.borderColor = 'var(--rose)';
-      }
-      this.mostrarToast('❌ Contraseña incorrecta', 'error');
-      
-      setTimeout(() => {
-        if (passwordInput) {
+        setTimeout(() => {
           passwordInput.classList.remove('error');
           passwordInput.style.borderColor = '';
-        }
-      }, 2000);
+        }, 2000);
+      }
+      this.mostrarToast('❌ Contraseña incorrecta', 'error');
     }
   },
   
   // ─────────────────────────────────────────────────────────────
-  // ENTRAR COMO CLIENTE (CORREGIDO - LAYOUT)
+  // ENTRAR COMO CLIENTE
   // ─────────────────────────────────────────────────────────────
   entrarComoCliente: function() {
     this.esAdmin = false;
     
-    // ⚠️ OCULTAR LOGIN COMPLETAMENTE
+    // Ocultar login
     const modal = document.getElementById('login-modal');
     if (modal) {
-      modal.style.setProperty('display', 'none', 'important');
-      modal.style.visibility = 'hidden';
-      modal.style.opacity = '0';
       modal.classList.remove('active');
+      modal.style.display = 'none';
     }
     
-    // ⚠️ MOSTRAR SIDEBAR CLIENTE
-    const sidebarAdmin = document.getElementById('sidebar-admin');
-    const sidebarCliente = document.getElementById('sidebar-cliente');
+    // Mostrar sidebar cliente
+    this.configurarSidebars();
     
-    if (sidebarAdmin)  sidebarAdmin.classList.remove('visible');
-    if (sidebarCliente) sidebarCliente.classList.add('visible');
-    
-    // ⚠️ FORZAR SCROLL AL INICIO
+    // Scroll al inicio
     window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     
-    // ⚠️ ESPERAR QUE EL LAYOUT SE ACTUALICE
-    setTimeout(() => {
-      // Forzar reflow
-      document.body.offsetHeight;
-      
-      // Mostrar pantalla estimador
-      this.mostrarPantalla('estimador-screen');
-      
-      // Verificar que el contenido esté en su lugar
-      const content = document.querySelector('.content');
-      const estimadorScreen = document.getElementById('estimador-screen');
-      
-      if (content && estimadorScreen) {
-        content.scrollLeft = 0;
-        estimadorScreen.scrollIntoView({ top: 0, behavior: 'auto' });
-      }
-    }, 100);
+    // Mostrar pantalla estimador
+    this.mostrarPantalla('estimador-screen');
     
     this.mostrarToast('👤 Modo Cliente Activado', 'info');
-    
     console.log('✅ Modo cliente activado');
   },
   
@@ -207,39 +203,30 @@ window.app = {
   verificarSesionAdmin: function() {
     const adminSession = localStorage.getItem('pwa_estimator_admin');
     const adminTime = localStorage.getItem('pwa_estimator_admin_time');
-    
-    // Sesión válida por 24 horas (86400000 ms)
-    const EXPIRATION = 24 * 60 * 60 * 1000;
+    const EXPIRATION = 24 * 60 * 60 * 1000; // 24 horas
     
     if (adminSession === 'true' && adminTime) {
       const timeDiff = Date.now() - parseInt(adminTime);
       if (timeDiff < EXPIRATION) {
         this.esAdmin = true;
         
-        // Mostrar sidebar admin
-        const sidebarAdmin = document.getElementById('sidebar-admin');
-        const sidebarCliente = document.getElementById('sidebar-cliente');
+        // Configurar sidebars
+        this.configurarSidebars();
         
-        if (sidebarAdmin) {
-          sidebarAdmin.classList.add('visible');
-        }
-        if (sidebarCliente) {
-          sidebarCliente.classList.remove('visible');
-        }
-        
-        // NO mostrar login
+        // Ocultar login
         const modal = document.getElementById('login-modal');
-        if (modal) {
-          modal.style.setProperty('display', 'none', 'important');
-        }
+        if (modal) modal.style.display = 'none';
         
         console.log('✅ Sesión admin válida');
-        return;
+        return true;
       }
     }
     
     // Sesión inválida o expirada
     this.esAdmin = false;
+    localStorage.removeItem('pwa_estimator_admin');
+    localStorage.removeItem('pwa_estimator_admin_time');
+    return false;
   },
   
   // ─────────────────────────────────────────────────────────────
@@ -251,27 +238,24 @@ window.app = {
       localStorage.removeItem('pwa_estimator_admin_time');
       this.esAdmin = false;
       
-      // Mostrar login
+      this.configurarSidebars();
       this.mostrarLogin();
-      
-      // Ir al estimador
       this.mostrarPantalla('estimador-screen');
-      
       this.mostrarToast('🚪 Sesión cerrada', 'info');
     }
   },
   
   // ─────────────────────────────────────────────────────────────
-  // MOSTRAR PANTALLA (CORREGIDO - NO OCULTAR MENÚS)
+  // MOSTRAR PANTALLA (OPTIMIZADO)
   // ─────────────────────────────────────────────────────────────
   mostrarPantalla: function(pantallaId) {
-    // Seguridad: Si no es admin, no puede ver admin-diagnosticos
+    // Seguridad: validar acceso a admin
     if (pantallaId === 'admin-diagnosticos-screen' && !this.esAdmin) {
       this.mostrarToast('🔐 Acceso restringido a admin', 'error');
       return;
     }
     
-    // Ocultar TODAS las pantallas (SOLO .screen, NO .nav-item)
+    // Ocultar todas las pantallas
     document.querySelectorAll('.screen').forEach(screen => {
       screen.classList.remove('active');
       screen.style.display = 'none';
@@ -283,37 +267,34 @@ window.app = {
       pantalla.style.display = 'block';
       pantalla.classList.add('active');
       this.pantallaActual = pantallaId;
+      
+      // Actualizar topbar
+      this.actualizarTopbar(pantallaId);
+      
+      // Actualizar menú activo
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      const navItem = document.querySelector(`.nav-item[onclick*="${pantallaId}"]`);
+      if (navItem) navItem.classList.add('active');
+      
+      // Inicializaciones específicas por pantalla
+      switch(pantallaId) {
+        case 'estimador-screen':
+          if (window.estimatorUI?.init) window.estimatorUI.init();
+          break;
+        case 'admin-diagnosticos-screen':
+          if (this.esAdmin) this.cargarDiagnosticos();
+          break;
+      }
     }
     
-    // Actualizar menú activo (SOLO cambia clase 'active', NO remueve elementos)
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.remove('active');
-    });
-    const navItem = document.querySelector(`.nav-item[onclick*="${pantallaId}"]`);
-    if (navItem) {
-      navItem.classList.add('active');
-    }
-    
-    // Casos especiales por pantalla
-    switch(pantallaId) {
-      case 'estimador-screen':
-        if (window.estimatorUI && typeof window.estimatorUI.init === 'function') {
-          window.estimatorUI.init();
-        }
-        break;
-      case 'admin-diagnosticos-screen':
-        if (this.esAdmin) {
-          this.cargarDiagnosticos();
-        }
-        break;
-    }
-    
-    // En móvil: cerrar sidebar después de seleccionar menú
+    // En móvil: cerrar sidebar después de navegar
     if (window.innerWidth <= 768) {
       const sidebar = document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
       const overlay = document.getElementById('sidebar-overlay');
-      if (sidebar) sidebar.classList.remove('visible');
-      if (overlay) overlay.classList.remove('active');
+      sidebar?.classList.remove('visible');
+      overlay?.classList.remove('active');
       document.body.style.overflow = '';
     }
     
@@ -339,7 +320,7 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // CARGAR DIAGNÓSTICOS (CON MANEJO DE ERRORES)
+  // CARGAR DIAGNÓSTICOS
   // ─────────────────────────────────────────────────────────────
   cargarDiagnosticos: async function() {
     try {
@@ -348,7 +329,7 @@ window.app = {
         return;
       }
       
-      if (window.adminDiagnosticos && typeof window.adminDiagnosticos.cargar === 'function') {
+      if (window.adminDiagnosticos?.cargar) {
         await window.adminDiagnosticos.cargar();
       }
       
@@ -362,10 +343,8 @@ window.app = {
       
     } catch (error) {
       console.error('❌ Error cargando diagnósticos:', error);
-      
-      // Si es error de permisos, mostrar mensaje útil
       if (error.code === 'permission-denied') {
-        this.mostrarToast('🔐 Error de permisos en Firebase. Revisa las reglas de Firestore.', 'error');
+        this.mostrarToast('🔐 Error de permisos en Firebase', 'error');
       }
     }
   },
@@ -374,17 +353,32 @@ window.app = {
   // CONFIGURAR NAVEGACIÓN
   // ─────────────────────────────────────────────────────────────
   configurarNavegacion: function() {
+    // Escape para cerrar modals/sidebar
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        // Cerrar sidebar en móvil
+        if (window.innerWidth <= 768) {
+          const sidebar = document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
+          const overlay = document.getElementById('sidebar-overlay');
+          sidebar?.classList.remove('visible');
+          overlay?.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+        // Volver al estimador
         this.mostrarPantalla('estimador-screen');
       }
     });
+    
+    // Resize para ajustar sidebars
+    window.addEventListener('resize', () => {
+      this.configurarSidebars();
+    });
   },
+  
   // ─────────────────────────────────────────────────────────────
-  // TOGGLE SIDEBAR (MÓVIL) - CORREGIDO PARA 2 SIDEBARS
+  // TOGGLE SIDEBAR (MÓVIL)
   // ─────────────────────────────────────────────────────────────
   toggleSidebar: function() {
-    // Determinar qué sidebar mostrar según el modo actual
     const sidebarId = this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente';
     const sidebar = document.getElementById(sidebarId);
     const overlay = document.getElementById('sidebar-overlay');
@@ -394,48 +388,36 @@ window.app = {
       return;
     }
     
-    // Toggle clase .visible en el sidebar correcto
+    // Toggle visibilidad
     sidebar.classList.toggle('visible');
+    overlay?.classList.toggle('active');
     
-    // Toggle overlay
-    if (overlay) {
-      overlay.classList.toggle('active');
-    }
-    
-    // Prevenir scroll del body cuando sidebar está abierto
+    // Prevenir scroll del body
     document.body.style.overflow = sidebar.classList.contains('visible') ? 'hidden' : '';
     
-    console.log('🔍 Sidebar toggle:', sidebarId, sidebar.classList.contains('visible') ? 'ABIERTO' : 'CERRADO');
+    console.log('🔍 Sidebar:', sidebarId, sidebar.classList.contains('visible') ? '🟢 ABIERTO' : '🔴 CERRADO');
   },
+  
   // ─────────────────────────────────────────────────────────────
-  // TOGGLE TEMA (CLARO/OSCURO)
+  // TOGGLE TEMA
   // ─────────────────────────────────────────────────────────────
   toggleTema: function() {
     const body = document.body;
-    const temaActual = body.classList.contains('tema-claro') ? 'oscuro' : 'claro';
+    const esClaro = body.classList.toggle('tema-claro');
     
-    if (temaActual === 'claro') {
-      body.classList.add('tema-claro');
-      localStorage.setItem('pwa_estimator_tema', 'claro');
-      console.log('🌞 Tema claro activado');
-    } else {
-      body.classList.remove('tema-claro');
-      localStorage.setItem('pwa_estimator_tema', 'oscuro');
-      console.log('🌙 Tema oscuro activado');
-    }
+    localStorage.setItem('pwa_estimator_tema', esClaro ? 'claro' : 'oscuro');
     
     const btn = document.querySelector('.topbar-btn[onclick*="toggleTema"]');
-    if (btn) {
-      btn.textContent = temaActual === 'claro' ? '🌙' : '🌓';
-    }
+    if (btn) btn.textContent = esClaro ? '🌙' : '🌓';
+    
+    console.log(`🎨 Tema: ${esClaro ? 'claro' : 'oscuro'}`);
   },
   
   // ─────────────────────────────────────────────────────────────
   // CARGAR TEMA GUARDADO
   // ─────────────────────────────────────────────────────────────
   cargarTemaGuardado: function() {
-    const temaGuardado = localStorage.getItem('pwa_estimator_tema');
-    if (temaGuardado === 'claro') {
+    if (localStorage.getItem('pwa_estimator_tema') === 'claro') {
       document.body.classList.add('tema-claro');
       const btn = document.querySelector('.topbar-btn[onclick*="toggleTema"]');
       if (btn) btn.textContent = '🌙';
@@ -459,17 +441,18 @@ window.app = {
     toast.textContent = mensaje;
     toast.style.display = 'block';
     
+    // Auto-ocultar
     setTimeout(() => {
       toast.style.display = 'none';
     }, 3000);
   }
 };
 
-// Inicializar cuando el DOM esté listo
+// ─────────────────────────────────────────────────────────────
+// INICIALIZAR CUANDO EL DOM ESTÉ LISTO
+// ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.app) {
-    window.app.init();
-  }
+  if (window.app) window.app.init();
 });
 
 console.log('✅ app.js listo');
