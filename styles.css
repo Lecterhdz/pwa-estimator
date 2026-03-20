@@ -1558,20 +1558,7 @@ body.tema-claro .topbar-btn.ghost {
 /* ══════════════════════════════════════ RESPONSIVE UNIFICADO - PWA ESTIMATOR ══════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────────────────────
-   TABLET (768px - 1024px)
-   ───────────────────────────────────────────────────────────── */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .layout { 
-    grid-template-columns: 200px 1fr !important; 
-  }
-  .sidebar { 
-    width: 200px !important; 
-    display: flex !important; /* Visible en tablet */
-  }
-  .content { 
-    padding: 24px !important; 
-  }
-}
+
 
 /* ══════════════════════════════════════ MÓVIL (max 768px) - ÚNICO BLOQUE ══════════════════════════════════════ */
 @media (max-width: 768px) {
