@@ -94,7 +94,7 @@ input, select, textarea {
   grid-area: sidebar !important;
   background: var(--white);
   border-right: 1px solid var(--border);
-  display: flex !important;        /* SIEMPRE flex — nunca none */
+  display: none !important;        /* SIEMPRE flex — nunca none */
   flex-direction: column;
   padding: 0;
   position: sticky;
