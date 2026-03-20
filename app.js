@@ -78,14 +78,8 @@ window.app = {
     const sidebarAdmin = document.getElementById('sidebar-admin');
     const sidebarCliente = document.getElementById('sidebar-cliente');
     
-    if (sidebarAdmin) {
-      sidebarAdmin.style.setProperty('display', 'none', 'important');
-      sidebarAdmin.classList.remove('visible');
-    }
-    if (sidebarCliente) {
-      sidebarCliente.style.setProperty('display', 'none', 'important');
-      sidebarCliente.classList.remove('visible');
-    }
+    if (sidebarAdmin)  sidebarAdmin.classList.remove('visible');
+    if (sidebarCliente) sidebarCliente.classList.remove('visible');
     
     // Forzar scroll al inicio
     window.scrollTo(0, 0);
@@ -120,14 +114,8 @@ window.app = {
       const sidebarAdmin = document.getElementById('sidebar-admin');
       const sidebarCliente = document.getElementById('sidebar-cliente');
       
-      if (sidebarAdmin) {
-        sidebarAdmin.style.setProperty('display', 'flex', 'important');
-        sidebarAdmin.classList.add('visible');
-      }
-      if (sidebarCliente) {
-        sidebarCliente.style.setProperty('display', 'none', 'important');
-        sidebarCliente.classList.remove('visible');
-      }
+      if (sidebarAdmin)  sidebarAdmin.classList.add('visible');
+      if (sidebarCliente) sidebarCliente.classList.remove('visible');
       
       // ⚠️ FORZAR SCROLL AL INICIO
       window.scrollTo(0, 0);
@@ -181,14 +169,8 @@ window.app = {
     const sidebarAdmin = document.getElementById('sidebar-admin');
     const sidebarCliente = document.getElementById('sidebar-cliente');
     
-    if (sidebarAdmin) {
-      sidebarAdmin.style.setProperty('display', 'none', 'important');
-      sidebarAdmin.classList.remove('visible');
-    }
-    if (sidebarCliente) {
-      sidebarCliente.style.setProperty('display', 'flex', 'important');
-      sidebarCliente.classList.add('visible');
-    }
+    if (sidebarAdmin)  sidebarAdmin.classList.remove('visible');
+    if (sidebarCliente) sidebarCliente.classList.add('visible');
     
     // ⚠️ FORZAR SCROLL AL INICIO
     window.scrollTo(0, 0);
@@ -238,11 +220,9 @@ window.app = {
         const sidebarCliente = document.getElementById('sidebar-cliente');
         
         if (sidebarAdmin) {
-          sidebarAdmin.style.setProperty('display', 'flex', 'important');
           sidebarAdmin.classList.add('visible');
         }
         if (sidebarCliente) {
-          sidebarCliente.style.setProperty('display', 'none', 'important');
           sidebarCliente.classList.remove('visible');
         }
         
