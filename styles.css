@@ -177,9 +177,19 @@ input, select, textarea {
   background: none;
   width: calc(100% - 16px);
   text-align: left;
-  overflow: hidden;        /* ← agrega esto */
-  white-space: nowrap;     /* ← agrega esto */
-  text-overflow: ellipsis; 
+  /* ✅ PREVENIR TRUNCADO DE TEXTO */
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+/* ✅ Asegurar que el texto de navegación sea visible */
+.nav-item > span:not(.nav-icon):not(.nav-badge) {
+  display: inline-block !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
 }
 
 .nav-item:hover { 
