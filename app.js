@@ -198,53 +198,42 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // VERIFICAR SESIÓN ADMIN (AL CARGAR)
+  // VERIFICAR SESIÓN ADMIN (CORREGIDO - SIN FLICKER)
   // ─────────────────────────────────────────────────────────────
   verificarSesionAdmin: function() {
     const adminSession = localStorage.getItem('pwa_estimator_admin');
     const adminTime = localStorage.getItem('pwa_estimator_admin_time');
     const EXPIRATION = 24 * 60 * 60 * 1000; // 24 horas
-    // ─────────────────────────────────────────────────────────────
-    // FORZAR SIDEBAR VISIBLE EN DESKTOP
-    // ─────────────────────────────────────────────────────────────
-    if (window.innerWidth >= 1025) {
-      // En desktop, el sidebar debe estar visible siempre
-      if (this.esAdmin) {
-        const sidebarAdmin = document.getElementById('sidebar-admin');
-        if (sidebarAdmin) {
-          sidebarAdmin.classList.add('visible');
-          console.log('✅ Sidebar-admin forzado visible en desktop');
-        }
-      } else {
-        const sidebarCliente = document.getElementById('sidebar-cliente');
-        if (sidebarCliente) {
-          sidebarCliente.classList.add('visible');
-          console.log('✅ Sidebar-cliente forzado visible en desktop');
-        }
-      }
-    }
+    
+    // 1️⃣ Primero verificar si la sesión es válida
+    let sesionValida = false;
     if (adminSession === 'true' && adminTime) {
       const timeDiff = Date.now() - parseInt(adminTime);
       if (timeDiff < EXPIRATION) {
-        this.esAdmin = true;
-        
-        // Configurar sidebars
-        this.configurarSidebars();
-        
-        // Ocultar login
-        const modal = document.getElementById('login-modal');
-        if (modal) modal.style.display = 'none';
-        
+        sesionValida = true;
+        this.esAdmin = true; // ← Establecer ANTES de cualquier UI
         console.log('✅ Sesión admin válida');
-        return true;
       }
     }
     
-    // Sesión inválida o expirada
-    this.esAdmin = false;
-    localStorage.removeItem('pwa_estimator_admin');
-    localStorage.removeItem('pwa_estimator_admin_time');
-    return false;
+    if (!sesionValida) {
+      // Sesión inválida o expirada
+      this.esAdmin = false;
+      localStorage.removeItem('pwa_estimator_admin');
+      localStorage.removeItem('pwa_estimator_admin_time');
+      return false;
+    }
+    
+    // 2️⃣ AHORA que sabemos el modo, configurar sidebars
+    this.configurarSidebars();
+    
+    // 3️⃣ Ocultar login modal si es admin
+    const modal = document.getElementById('login-modal');
+    if (modal && this.esAdmin) {
+      modal.style.display = 'none';
+    }
+    
+    return true;
   },
   
   // ─────────────────────────────────────────────────────────────
@@ -368,13 +357,12 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // CONFIGURAR NAVEGACIÓN
+  // CONFIGURAR NAVEGACIÓN (CORREGIDO - SIN FLICKER EN RESIZE)
   // ─────────────────────────────────────────────────────────────
   configurarNavegacion: function() {
     // Escape para cerrar modals/sidebar
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        // Cerrar sidebar en móvil
         if (window.innerWidth <= 768) {
           const sidebar = document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
           const overlay = document.getElementById('sidebar-overlay');
@@ -382,14 +370,35 @@ window.app = {
           overlay?.classList.remove('active');
           document.body.style.overflow = '';
         }
-        // Volver al estimador
         this.mostrarPantalla('estimador-screen');
       }
     });
     
-    // Resize para ajustar sidebars
+    // Resize con debounce para evitar flicker
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-      this.configurarSidebars();
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Solo ajustar si cambió de móvil a desktop o viceversa
+        const esMovilAhora = window.innerWidth <= 768;
+        const sidebarAdmin = document.getElementById('sidebar-admin');
+        const sidebarCliente = document.getElementById('sidebar-cliente');
+        
+        if (this.esAdmin && sidebarAdmin) {
+          if (esMovilAhora) {
+            sidebarAdmin.classList.remove('visible'); // En móvil: oculto hasta toggle
+          } else {
+            sidebarAdmin.classList.add('visible'); // En desktop: visible
+          }
+        }
+        if (!this.esAdmin && sidebarCliente) {
+          if (esMovilAhora) {
+            sidebarCliente.classList.remove('visible');
+          } else {
+            sidebarCliente.classList.add('visible');
+          }
+        }
+      }, 150); // Esperar 150ms después del último resize
     });
   },
   
