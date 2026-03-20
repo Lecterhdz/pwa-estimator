@@ -1,77 +1,170 @@
 // ═══════════════════════════════════════════════════════════════
-// PWA ESTIMATOR - MÓDULO DE AUTENTICACIÓN (auth.js)
+// PWA ESTIMATOR - FIREBASE AUTHENTICATION (auth.js)
 // ═══════════════════════════════════════════════════════════════
 
 console.log('🔐 auth.js cargado');
 
-window.auth = {
-  // ⚠️ NUNCA exponer contraseña real en frontend
-  // En producción, usar Firebase Auth o backend para validación
-  ADMIN_HASH: 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', // SHA256 de '123456' (ejemplo)
+window.pwaAuth = {
   
-  // Verificar contraseña con hash (más seguro que texto plano)
-  verificarPassword: function(password) {
-    // En producción: enviar password al backend para validación
-    // Aquí usamos hash simple como ejemplo educativo
-    const hash = this.simpleHash(password);
-    return hash === this.ADMIN_HASH;
-  },
-  
-  // Hash simple (NO es criptográficamente seguro, solo para ejemplo)
-  // En producción usar: Web Crypto API o backend
-  simpleHash: function(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
+  // ─────────────────────────────────────────────────────────────
+  // INICIALIZAR AUTH
+  // ─────────────────────────────────────────────────────────────
+  init: function() {
+    if (!firebase.apps.length) {
+      console.error('❌ Firebase no inicializado');
+      return false;
     }
-    return Math.abs(hash).toString(16);
-  },
-  
-  // Guardar sesión de admin
-  iniciarSesionAdmin: function() {
-    const sessionData = {
-      admin: true,
-      timestamp: Date.now(),
-      expires: Date.now() + (24 * 60 * 60 * 1000) // 24 horas
-    };
-    localStorage.setItem('pwa_estimator_session', JSON.stringify(sessionData));
-    console.log('✅ Sesión admin iniciada');
-  },
-  
-  // Verificar si hay sesión válida
-  tieneSesionValida: function() {
-    try {
-      const session = JSON.parse(localStorage.getItem('pwa_estimator_session'));
-      if (!session || !session.admin) return false;
-      if (Date.now() > session.expires) {
-        this.cerrarSesion();
-        return false;
+    
+    this.auth = firebase.auth();
+    this.db = firebase.firestore();
+    
+    // Escuchar cambios de autenticación
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log('✅ Usuario autenticado:', user.email);
+        this.onAuthSuccess(user);
+      } else {
+        console.log('🚫 Sin sesión activa');
+        this.onAuthLogout();
       }
-      return true;
-    } catch (e) {
+    });
+    
+    return true;
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // REGISTRAR ADMIN (SOLO PRIMERA VEZ)
+  // ─────────────────────────────────────────────────────────────
+  registrarAdmin: async function(email, password, nombre) {
+    try {
+      const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+      
+      // Guardar datos adicionales en Firestore
+      await this.db.collection('admins').doc(userCredential.user.uid).set({
+        email: email,
+        nombre: nombre || 'Admin',
+        rol: 'admin',
+        creado: firebase.firestore.FieldValue.serverTimestamp(),
+        ultimoAcceso: null
+      });
+      
+      console.log('✅ Admin registrado:', email);
+      return { exito: true, user: userCredential.user };
+      
+    } catch (error) {
+      console.error('❌ Error registrando admin:', error.code, error.message);
+      return { exito: false, error: this.mapearErrorAuth(error.code) };
+    }
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // INICIAR SESIÓN
+  // ─────────────────────────────────────────────────────────────
+  login: async function(email, password) {
+    try {
+      const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
+      
+      // Actualizar último acceso
+      await this.db.collection('admins').doc(userCredential.user.uid).update({
+        ultimoAcceso: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      console.log('✅ Login exitoso:', email);
+      return { exito: true, user: userCredential.user };
+      
+    } catch (error) {
+      console.error('❌ Error login:', error.code, error.message);
+      return { exito: false, error: this.mapearErrorAuth(error.code) };
+    }
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // CERRAR SESIÓN
+  // ─────────────────────────────────────────────────────────────
+  logout: async function() {
+    try {
+      await this.auth.signOut();
+      console.log('🚪 Sesión cerrada');
+      return { exito: true };
+    } catch (error) {
+      console.error('❌ Error logout:', error);
+      return { exito: false, error: error.message };
+    }
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // RECUPERAR CONTRASEÑA
+  // ─────────────────────────────────────────────────────────────
+  recuperarPassword: async function(email) {
+    try {
+      await this.auth.sendPasswordResetEmail(email);
+      console.log('✅ Email de recuperación enviado');
+      return { exito: true };
+    } catch (error) {
+      console.error('❌ Error recuperar password:', error);
+      return { exito: false, error: this.mapearErrorAuth(error.code) };
+    }
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // VERIFICAR SI ES ADMIN
+  // ─────────────────────────────────────────────────────────────
+  esAdmin: async function() {
+    const user = this.auth.currentUser;
+    if (!user) return false;
+    
+    try {
+      const doc = await this.db.collection('admins').doc(user.uid).get();
+      return doc.exists && doc.data().rol === 'admin';
+    } catch (error) {
+      console.error('❌ Error verificando admin:', error);
       return false;
     }
   },
   
-  // Cerrar sesión
-  cerrarSesion: function() {
-    localStorage.removeItem('pwa_estimator_session');
-    console.log('🚪 Sesión cerrada');
+  // ─────────────────────────────────────────────────────────────
+  // OBTENER USUARIO ACTUAL
+  // ─────────────────────────────────────────────────────────────
+  usuarioActual: function() {
+    return this.auth.currentUser;
   },
   
-  // Obtener datos de sesión
-  getSesion: function() {
-    try {
-      return JSON.parse(localStorage.getItem('pwa_estimator_session'));
-    } catch (e) {
-      return null;
-    }
+  // ─────────────────────────────────────────────────────────────
+  // MAPEAR ERRORES DE AUTH A MENSAJES EN ESPAÑOL
+  // ─────────────────────────────────────────────────────────────
+  mapearErrorAuth: function(codigo) {
+    const errores = {
+      'auth/email-already-in-use': 'Este email ya está registrado',
+      'auth/invalid-email': 'Email inválido',
+      'auth/operation-not-allowed': 'Operación no permitida',
+      'auth/weak-password': 'Contraseña muy débil (mínimo 6 caracteres)',
+      'auth/user-disabled': 'Usuario deshabilitado',
+      'auth/user-not-found': 'Usuario no encontrado',
+      'auth/wrong-password': 'Contraseña incorrecta',
+      'auth/invalid-credential': 'Credenciales inválidas',
+      'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
+      'auth/network-request-failed': 'Error de conexión. Verifica tu internet'
+    };
+    return errores[codigo] || 'Error de autenticación';
+  },
+  
+  // ─────────────────────────────────────────────────────────────
+  // CALLBACKS (sobrescribir en app.js si es necesario)
+  // ─────────────────────────────────────────────────────────────
+  onAuthSuccess: function(user) {
+    console.log('🔐 Auth success:', user.email);
+    // Sobrescribir en app.js para manejar UI
+  },
+  
+  onAuthLogout: function() {
+    console.log('🔐 Auth logout');
+    // Sobrescribir en app.js para manejar UI
   }
 };
 
-// Exportar para uso global
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = window.auth;
+// Inicializar cuando Firebase esté listo
+if (typeof firebase !== 'undefined') {
+  window.pwaAuth.init();
 }
+
+console.log('✅ auth.js listo');
