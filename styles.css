@@ -104,10 +104,7 @@ input, select, textarea {
   z-index: 100;
   width: 240px;
   flex-shrink: 0;
-  /* Sin transform aquí — desktop no necesita animación */
 }
-
-/* En desktop .visible no hace nada especial, ya está visible */
 .sidebar.visible {
   display: flex !important;
 }
@@ -1584,9 +1581,9 @@ body.tema-claro .topbar-btn.ghost {
     grid-template-areas: "main" !important;
   }
   
-  /* Sidebar: OCULTO por defecto */
+  /* Sidebar: OCULTO por defecto en móvil, se muestra con .visible */
   .sidebar {
-    display: none !important;
+    display: none !important; /* ← Oculto por defecto SOLO en móvil */
     position: fixed !important;
     left: -280px !important;
     top: 0 !important;
@@ -1598,8 +1595,9 @@ body.tema-claro .topbar-btn.ghost {
   }
   
   .sidebar.visible {
-    display: flex !important;
+    display: flex !important; /* ← Solo visible con esta clase */
     left: 0 !important;
+    animation: slideIn 0.3s ease !important;
   }
   
   /* Overlay */
@@ -1659,25 +1657,15 @@ body.tema-claro .topbar-btn.ghost {
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
-   DESKTOP (min 1025px) - Sidebar visible SIEMPRE
-   ───────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════ DESKTOP (min 1025px) ══════════════════════════════════════ */
 @media (min-width: 1025px) {
   .sidebar {
-    display: flex !important; /* ← Sidebar visible siempre en desktop */
+    display: flex !important; /* ← Sidebar visible SIEMPRE en desktop */
     position: sticky !important;
     left: 0 !important;
   }
-  .hamburger-btn { 
-    display: none !important; 
-  }
-  .sidebar-overlay { 
-    display: none !important; 
-  }
+  .hamburger-btn { display: none !important; }
+  .sidebar-overlay { display: none !important; }
 }
 
-/* Animación slide-in */
-@keyframes slideIn {
-  from { left: -280px; }
-  to { left: 0; }
-}
+@keyframes slideIn { from { left: -280px; } to { left: 0; } }
