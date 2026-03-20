@@ -166,17 +166,17 @@ window.adminDiagnosticos = {
     }
   },
   // ─────────────────────────────────────────────────────────────
-  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO - SIN UNDEFINED)
+  // CAMBIAR STATUS DEL PROYECTO (CORREGIDO - ACTUALIZA, NO CREA)
   // ─────────────────────────────────────────────────────────────
   cambiarStatus: async function(id) {
     try {
       console.log('🔍 Cambiar status - ID:', id);
       
       // Buscar en cache primero
-      let diagnostico = this.diagnosticosCache?.find(d => (d.id || d._id) === id);
+      let diagnostico = this.diagnosticosCache?.find(d => d.id === id);
       
       // Si no está en cache, buscar en DB
-      if (!diagnostico && window.db?.diagnosticos?.get) {
+      if (!diagnostico && window.db?.diagnosticos) {
         diagnostico = await window.db.diagnosticos.get(id);
       }
       
@@ -188,12 +188,12 @@ window.adminDiagnosticos = {
       const statusActual = diagnostico.status || 'pendiente';
       
       // Mostrar menú de status
+      const opciones = `1️⃣ Pendiente\n2️⃣ Contactado\n3️⃣ ✅ Aceptada\n4️⃣ 🔄 En Proceso\n5️⃣ 🎉 Entregada\n6️⃣ ❌ Rechazada`;
+      
       const nuevoStatus = prompt(
         `Cambiar estado del proyecto:\n\n` +
         `Estado actual: ${statusActual.toUpperCase()}\n\n` +
-        `Escribe el número:\n` +
-        `1️⃣ Pendiente\n2️⃣ Contactado\n3️⃣ ✅ Aceptada\n` +
-        `4️⃣ 🔄 En Proceso\n5️⃣ 🎉 Entregada\n6️⃣ ❌ Rechazada`,
+        `Escribe el número del nuevo estado:\n${opciones}`,
         this.getStatusNumber(statusActual)
       );
       
@@ -201,7 +201,7 @@ window.adminDiagnosticos = {
       
       const statusMap = {
         '1': 'pendiente',
-        '2': 'contactado', 
+        '2': 'contactado',
         '3': 'aceptada',
         '4': 'en_proceso',
         '5': 'entregada',
@@ -210,10 +210,8 @@ window.adminDiagnosticos = {
       
       const statusFinal = statusMap[nuevoStatus] || statusActual;
       
-      // ⚠️ CORRECCIÓN: Inicializar fechaEntrega como null (no undefined)
-      let fechaEntrega = null;
-      
-      // Solo pedir fecha si es "En Proceso"
+      // Si es "En Proceso", pedir fecha de entrega
+      let fechaEntrega = diagnostico.fechaEntrega;
       if (statusFinal === 'en_proceso') {
         const semanas = diagnostico.resultado?.semanas || '8';
         const fechaSugerida = this.calcularFechaEntrega(semanas);
@@ -221,26 +219,30 @@ window.adminDiagnosticos = {
           `Fecha estimada de entrega:\n\nFormato: YYYY-MM-DD\nSugerida: ${fechaSugerida}`,
           fechaSugerida
         );
-        // ⚠️ Si el usuario cancela o deja vacío, usar null (no undefined)
-        fechaEntrega = fechaInput || null;
+        if (fechaInput) fechaEntrega = fechaInput;
       }
       
       // Si es "Entregada", mostrar checklist
       if (statusFinal === 'entregada') {
         const checklist = confirm(
           `✅ Checklist de Entrega:\n\n` +
-          `□ Código fuente\n□ Documentación\n□ PWA funcionando\n` +
-          `□ Credenciales\n□ Pago final\n\n¿Todo completado?`
+          `□ Código fuente entregado\n` +
+          `□ Documentación completa\n` +
+          `□ PWA instalable funcionando\n` +
+          `□ Credenciales entregadas\n` +
+          `□ Pago final recibido\n\n` +
+          `¿Confirmas que todo está completado?`
         );
         if (!checklist) return;
       }
       
-      // ⚠️ CORRECCIÓN: Solo agregar fechaEntrega si tiene valor válido
+      // ✅ ACTUALIZAR campos del documento EXISTENTE
       diagnostico.status = statusFinal;
-      if (fechaEntrega) {
-        diagnostico.fechaEntrega = fechaEntrega;
-      }
+      diagnostico.fechaEntrega = fechaEntrega;
       diagnostico.fechaStatusChange = new Date().toISOString();
+      
+      // ✅ CORRECCIÓN CLAVE: Incluir el ID para que UPDATE en lugar de CREATE
+      diagnostico.id = id; // ← ESTO EVITA QUE SE CREE UNO NUEVO
       
       // Guardar en DB
       await window.db.diagnosticos.add(diagnostico);
@@ -248,8 +250,8 @@ window.adminDiagnosticos = {
       console.log('✅ Status actualizado:', statusFinal);
       alert(`✅ Estado actualizado a: ${this.getStatusLabel(statusFinal)}`);
       
-      // Actualizar cache
-      const index = this.diagnosticosCache?.findIndex(d => (d.id || d._id) === id);
+      // Actualizar cache local
+      const index = this.diagnosticosCache?.findIndex(d => d.id === id);
       if (index !== -1 && this.diagnosticosCache) {
         this.diagnosticosCache[index] = diagnostico;
       }
