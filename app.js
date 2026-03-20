@@ -204,7 +204,25 @@ window.app = {
     const adminSession = localStorage.getItem('pwa_estimator_admin');
     const adminTime = localStorage.getItem('pwa_estimator_admin_time');
     const EXPIRATION = 24 * 60 * 60 * 1000; // 24 horas
-    
+    // ─────────────────────────────────────────────────────────────
+    // FORZAR SIDEBAR VISIBLE EN DESKTOP
+    // ─────────────────────────────────────────────────────────────
+    if (window.innerWidth >= 1025) {
+      // En desktop, el sidebar debe estar visible siempre
+      if (this.esAdmin) {
+        const sidebarAdmin = document.getElementById('sidebar-admin');
+        if (sidebarAdmin) {
+          sidebarAdmin.classList.add('visible');
+          console.log('✅ Sidebar-admin forzado visible en desktop');
+        }
+      } else {
+        const sidebarCliente = document.getElementById('sidebar-cliente');
+        if (sidebarCliente) {
+          sidebarCliente.classList.add('visible');
+          console.log('✅ Sidebar-cliente forzado visible en desktop');
+        }
+      }
+    }
     if (adminSession === 'true' && adminTime) {
       const timeDiff = Date.now() - parseInt(adminTime);
       if (timeDiff < EXPIRATION) {
