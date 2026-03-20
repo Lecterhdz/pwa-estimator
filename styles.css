@@ -82,7 +82,7 @@ input, select, textarea {
 /* ══════════════════════════════════════ LAYOUT PRINCIPAL ══════════════════════════════════════ */
 .layout { 
   display: grid !important; 
-  grid-template-columns: 240px 1fr !important; 
+  grid-template-columns: 260px 1fr !important; 
   grid-template-areas: "sidebar main" !important;
   min-height: 100vh !important;
   width: 100% !important;
@@ -102,7 +102,7 @@ input, select, textarea {
   height: 100vh;
   overflow-y: auto;
   z-index: 100;
-  width: 240px;
+  width: 260px;
   flex-shrink: 0;
 }
 .sidebar.visible {
@@ -1607,10 +1607,10 @@ body.tema-claro .topbar-btn.ghost {
     position: fixed !important;
     left: 0 !important;
     top: 0 !important;
-    width: 240px !important;
+    width: 260px !important;
     height: 100vh !important;
-    z-index: 240 !important;
-     transform: translateX(-240px) !important;  /* ← oculto así, no con display */
+    z-index: 260 !important;
+     transform: translateX(-260px) !important;  /* ← oculto así, no con display */
      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
      box-shadow: none !important;
   }
@@ -1684,7 +1684,7 @@ body.tema-claro .topbar-btn.ghost {
     display: flex !important;
     position: sticky !important;
     left: 0 !important;
-    width: 240px !important;
+    width: 260px !important;
   }
   
   /* Asegurar que los nav-items dentro sean visibles */
