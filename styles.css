@@ -103,10 +103,6 @@ input, select, textarea {
   flex-shrink: 0;
 }
 
-.sidebar.visible {
-  display: flex !important;
-}
-
 .sidebar-logo {
   padding: 24px 20px 20px;
   border-bottom: 1px solid var(--border);
