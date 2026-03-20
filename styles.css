@@ -184,9 +184,9 @@ input, select, textarea {
 
 .nav-item:hover { 
   background: var(--bg); 
-  color: var(--ink); 
+  color: var(--ink);
 }
-
+ /* ← agrega esto *
 .nav-item.active { 
   background: var(--blue-l); 
   color: var(--blue); 
