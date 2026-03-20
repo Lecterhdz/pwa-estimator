@@ -220,13 +220,13 @@ input, select, textarea {
   border-radius: 20px;
   font-family: var(--mono);
 }
-
+*/
 .sidebar-footer { 
   margin-top: auto; 
   padding: 16px; 
   border-top: 1px solid var(--border); 
 }
-*/
+
 .btn-salir {
   /* ✅ Reset de estilos nativos */
   appearance: none !important;
