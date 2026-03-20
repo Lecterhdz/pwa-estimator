@@ -266,7 +266,7 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // MOSTRAR PANTALLA
+  // MOSTRAR PANTALLA (CORREGIDO - NO OCULTAR MENÚS)
   // ─────────────────────────────────────────────────────────────
   mostrarPantalla: function(pantallaId) {
     // Seguridad: Si no es admin, no puede ver admin-diagnosticos
@@ -275,7 +275,7 @@ window.app = {
       return;
     }
     
-    // Ocultar todas las pantallas
+    // Ocultar TODAS las pantallas (SOLO .screen, NO .nav-item)
     document.querySelectorAll('.screen').forEach(screen => {
       screen.classList.remove('active');
       screen.style.display = 'none';
@@ -287,33 +287,46 @@ window.app = {
       pantalla.style.display = 'block';
       pantalla.classList.add('active');
       this.pantallaActual = pantallaId;
-      
-      // Actualizar topbar
-      this.actualizarTopbar(pantallaId);
-      
-      // Actualizar menú activo
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      const navItem = document.querySelector(`.nav-item[onclick*="${pantallaId}"]`);
-      if (navItem) navItem.classList.add('active');
-      
-      // Casos especiales por pantalla
-      switch(pantallaId) {
-        case 'estimador-screen':
-          if (window.estimatorUI && typeof window.estimatorUI.init === 'function') {
-            window.estimatorUI.init();
-          }
-          break;
-        case 'admin-diagnosticos-screen':
-          if (this.esAdmin) {
-            this.cargarDiagnosticos();
-          }
-          break;
-      }
-      
-      console.log('📍 Pantalla:', pantallaId);
     }
+    
+    // Actualizar topbar
+    this.actualizarTopbar(pantallaId);
+    
+    // Actualizar menú activo (SOLO cambia clase 'active', NO remueve elementos)
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    
+    // Buscar el nav-item correcto por data-pantalla (más confiable que onclick)
+    const navItem = document.querySelector(`.nav-item[data-pantalla="${pantallaId}"]`);
+    if (navItem) {
+      navItem.classList.add('active');
+    }
+    
+    // Casos especiales por pantalla
+    switch(pantallaId) {
+      case 'estimador-screen':
+        if (window.estimatorUI && typeof window.estimatorUI.init === 'function') {
+          window.estimatorUI.init();
+        }
+        break;
+      case 'admin-diagnosticos-screen':
+        if (this.esAdmin) {
+          this.cargarDiagnosticos();
+        }
+        break;
+    }
+    
+    // En móvil: cerrar sidebar después de seleccionar menú
+    if (window.innerWidth <= 768) {
+      const sidebar = document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar) sidebar.classList.remove('visible');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    console.log('📍 Pantalla:', pantallaId);
   },
   
   // ─────────────────────────────────────────────────────────────
