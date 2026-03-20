@@ -1666,5 +1666,6 @@ body.tema-claro .topbar-btn.ghost {
   }
   .hamburger-btn { display: none !important; }
   .sidebar-overlay { display: none !important; }
+   .bottom-nav { display: none !important; } 
 }
 
