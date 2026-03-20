@@ -376,23 +376,20 @@ window.app = {
       }
     });
   },
-  // ─────────────────────────────────────────────────────────────
-  // TOGGLE SIDEBAR (MÓVIL)
-  // ─────────────────────────────────────────────────────────────
   toggleSidebar: function() {
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
+    // Seleccionar el sidebar que esté visible o el correspondiente al modo actual
+    const sidebar = document.querySelector('.sidebar.visible') || 
+                    document.getElementById(this.esAdmin ? 'sidebar-admin' : 'sidebar-cliente');
     
     if (!sidebar) return;
     
-    // Toggle clase .visible (no .open como en SmartCot)
     sidebar.classList.toggle('visible');
     
+    const overlay = document.getElementById('sidebar-overlay');
     if (overlay) {
       overlay.classList.toggle('active');
     }
     
-    // Prevenir scroll del body cuando sidebar está abierto
     document.body.style.overflow = sidebar.classList.contains('visible') ? 'hidden' : '';
   },
   // ─────────────────────────────────────────────────────────────
