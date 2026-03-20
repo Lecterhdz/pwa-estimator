@@ -126,17 +126,16 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // VERIFICAR ADMIN
+  // VERIFICAR ADMIN (USANDO auth.js)
   // ─────────────────────────────────────────────────────────────
   verificarAdmin: function() {
     const passwordInput = document.getElementById('admin-password');
     const password = passwordInput?.value || '';
     
-    if (password === this.ADMIN_PASSWORD) {
-      // Guardar sesión
-      localStorage.setItem('pwa_estimator_admin', 'true');
-      localStorage.setItem('pwa_estimator_admin_time', Date.now().toString());
-      
+    // Validar con auth.js
+    if (auth.verificarPassword(password)) {
+      // ✅ Contraseña correcta
+      auth.iniciarSesionAdmin();
       this.esAdmin = true;
       
       // Ocultar login
@@ -149,20 +148,16 @@ window.app = {
       // Mostrar sidebar correcto
       this.configurarSidebars();
       
-      // Scroll al inicio
+      // Scroll y feedback
       window.scrollTo(0, 0);
-      
-      // Cargar diagnósticos
       this.cargarDiagnosticos();
-      
-      // Feedback
       this.mostrarToast('✅ Bienvenido Admin', 'success');
-      if (passwordInput) passwordInput.value = '';
       
-      console.log('✅ Admin autenticado');
+      if (passwordInput) passwordInput.value = '';
+      console.log('✅ Admin autenticado vía auth.js');
       
     } else {
-      // Error de contraseña
+      // ❌ Contraseña incorrecta
       if (passwordInput) {
         passwordInput.classList.add('error');
         passwordInput.style.borderColor = 'var(--rose)';
@@ -202,51 +197,37 @@ window.app = {
   },
   
   // ─────────────────────────────────────────────────────────────
-  // VERIFICAR SESIÓN ADMIN (CORREGIDO - SIN FLICKER)
+  // VERIFICAR SESIÓN ADMIN (USANDO auth.js)
   // ─────────────────────────────────────────────────────────────
   verificarSesionAdmin: function() {
-    const adminSession = localStorage.getItem('pwa_estimator_admin');
-    const adminTime = localStorage.getItem('pwa_estimator_admin_time');
-    const EXPIRATION = 24 * 60 * 60 * 1000; // 24 horas
-    
-    // 1️⃣ Primero verificar si la sesión es válida
-    let sesionValida = false;
-    if (adminSession === 'true' && adminTime) {
-      const timeDiff = Date.now() - parseInt(adminTime);
-      if (timeDiff < EXPIRATION) {
-        sesionValida = true;
-        this.esAdmin = true; // ← Establecer ANTES de cualquier UI
-        console.log('✅ Sesión admin válida');
-      }
+    // Usar auth.js para verificar sesión
+    if (auth.tieneSesionValida()) {
+      this.esAdmin = true;
+      
+      // Configurar sidebars
+      this.configurarSidebars();
+      
+      // Ocultar login
+      const modal = document.getElementById('login-modal');
+      if (modal) modal.style.display = 'none';
+      
+      console.log('✅ Sesión admin válida (auth.js)');
+      return true;
     }
     
-    if (!sesionValida) {
-      // Sesión inválida o expirada
-      this.esAdmin = false;
-      localStorage.removeItem('pwa_estimator_admin');
-      localStorage.removeItem('pwa_estimator_admin_time');
-      return false;
-    }
-    
-    // 2️⃣ AHORA que sabemos el modo, configurar sidebars
-    this.configurarSidebars();
-    
-    // 3️⃣ Ocultar login modal si es admin
-    const modal = document.getElementById('login-modal');
-    if (modal && this.esAdmin) {
-      modal.style.display = 'none';
-    }
-    
-    return true;
+    // Sin sesión válida
+    this.esAdmin = false;
+    auth.cerrarSesion(); // Limpiar sesión inválida
+    return false;
   },
   
   // ─────────────────────────────────────────────────────────────
-  // CERRAR SESIÓN ADMIN
+  // CERRAR SESIÓN ADMIN (USANDO auth.js)
   // ─────────────────────────────────────────────────────────────
   cerrarSesionAdmin: function() {
     if (confirm('¿Cerrar sesión de admin?')) {
-      localStorage.removeItem('pwa_estimator_admin');
-      localStorage.removeItem('pwa_estimator_admin_time');
+      // Usar auth.js para cerrar sesión
+      auth.cerrarSesion();
       this.esAdmin = false;
       
       this.configurarSidebars();
